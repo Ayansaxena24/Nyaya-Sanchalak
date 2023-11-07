@@ -2,23 +2,23 @@ const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
-exports.currentUser = async (req, res) => {
-    // console.log(req.user.email);
-    User.findOne({email: req.user.email}).exec((err, user) => {
-        if (err) {
-            throw new Error(err);
-        } else {
-            res.json(user);
-        }
-    })
-};
+// exports.currentUser = async (req, res) => {
+//     // console.log(req.user.email);
+//     User.findOne({email: req.user.email}).exec((err, user) => {
+//         if (err) {
+//             throw new Error(err);
+//         } else {
+//             res.json(user);
+//         }
+//     })
+// };
 
 exports.handleRegister = async (req, res) => {
-    const { user, password, roles } = req.body;
-    if (!user || !password) return res.status(400).json({ 'message': 'Username and password are required.' });
+    const { jobId, name, password, roles, court } = req.body;
+    if (!jobId || !name || !password) return res.status(400).json({ 'message': 'JobID, name and password are required.' });
 
     // check for duplicate usernames in the db
-    const duplicate = await User.findOne({ username: user }).exec();
+    const duplicate = await User.findOne({ jobId: jobId }).exec();
     if (duplicate) return res.sendStatus(409); //Conflict 
 
     try {
@@ -27,24 +27,26 @@ exports.handleRegister = async (req, res) => {
 
         //create and store the new user
         const result = await User.create({
-            username: user,
+            jobId: jobId,
+            name: name,
             password: hashedPwd,
-            roles
+            roles,
+            court
         });
 
         // console.log(result);
 
-        res.status(201).json({ 'success': `New user ${user} created!` });
+        res.status(201).json({ 'success': `New user ${name} created!` });
     } catch (err) {
         res.status(500).json({ 'message': err.message });
     }
 }
 
 exports.handleLogin = async (req, res) => {
-    const { user, password } = req.body;
-    if (!user || !password) return res.status(400).json({ 'message': 'Username and password are required.' });
+    const { jobId, password } = req.body;
+    if (!jobId || !password) return res.status(400).json({ 'message': 'JobID and password are required.' });
 
-    const foundUser = await User.findOne({ username: user }).exec();
+    const foundUser = await User.findOne({ jobId: jobId }).exec();
     if (!foundUser) return res.sendStatus(401); //Unauthorized 
     
     // evaluate password 
@@ -55,15 +57,17 @@ exports.handleLogin = async (req, res) => {
         const accessToken = jwt.sign(
             {
                 "UserInfo": {
-                    "username": foundUser.username,
-                    "roles": roles
+                    "jobId": foundUser.jobId,
+                    "name": foundUser.name,
+                    "roles": roles,
+                    "court": foundUser.court
                 }
             },
             process.env.ACCESS_TOKEN_SECRET,
             { expiresIn: '10s' }
         );
         const refreshToken = jwt.sign(
-            { "username": foundUser.username },
+            { "jobId": foundUser.jobId },
             process.env.REFRESH_TOKEN_SECRET,
             { expiresIn: '1d' }
         );
@@ -109,6 +113,7 @@ exports.handleLogout = async (req, res) => {
 
 exports.handleRefreshToken = async (req, res) => {
     const cookies = req.cookies;
+    console.log("cookies -> ",cookies);
     if (!cookies?.jwt) return res.sendStatus(401);
     const refreshToken = cookies.jwt;
 
@@ -119,13 +124,15 @@ exports.handleRefreshToken = async (req, res) => {
         refreshToken,
         process.env.REFRESH_TOKEN_SECRET,
         (err, decoded) => {
-            if (err || foundUser.username !== decoded.username) return res.sendStatus(403);
+            if (err || foundUser.jobId !== decoded.jobId) return res.sendStatus(403);
             const roles = Object.values(foundUser.roles);
             const accessToken = jwt.sign(
                 {
                     "UserInfo": {
-                        "username": decoded.username,
-                        "roles": roles
+                        "jobId": decoded.jobId,
+                        "name": foundUser.name,
+                        "roles": roles,
+                        "court": foundUser.court,
                     }
                 },
                 process.env.ACCESS_TOKEN_SECRET,

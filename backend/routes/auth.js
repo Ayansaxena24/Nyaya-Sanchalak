@@ -5,7 +5,7 @@ const router = express.Router();
 const {verifyJWT, verifyRoles} = require('../middlewares/auth');
 
 // controllers
-const { handleRefreshToken, handleRegister, handleLogin, handleLogout, currentUser } = require('../controllers/auth');
+const { handleRefreshToken, handleRegister, handleLogin, handleLogout } = require('../controllers/auth');
 
 router.post('/register', handleRegister);
 router.post('/login', handleLogin);

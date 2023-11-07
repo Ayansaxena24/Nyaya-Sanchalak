@@ -269,7 +269,23 @@ const registeredCaseSchema = new mongoose.Schema({
     registration: {
         caseType: String,
         nature: String,
-    }
+    },
+
+    caseStatus: {
+        type: String,
+        default: 'pending',
+        enum: ['pending', ''],
+    },
+    caseHistory: [
+        {
+            status: String,
+            date: Date,
+            court: {
+                type: ObjectId,
+                ref: 'Court',
+            }
+        }
+    ]
 }, {timestamps: true});
 
 module.exports = mongoose.model('RegisteredCase', registeredCaseSchema);
