@@ -7,10 +7,19 @@ const ROLES_LIST = require('../config/rolesList');
 const { verifyJWT, verifyRoles } = require('../middlewares/auth');
 
 // controllers
-// const {  } = require('../controllers/courtAdmin');
+const { fileCase, registerCase, removeFiledCase, removeRegisteredCase, updateFiledCase, updateRegisteredCase } = require('../controllers/courtAdmin');
 
-// router.post('/create-or-update-user', authCheck, createOrUpdateUser);
-// router.post('/current-user', authCheck, currentUser);
-// router.post('/current-admin', authCheck, adminCheck, currentUser);
+// File case
+router.post('/court/file-case', fileCase)
+router.put('/court/file-case', updateFiledCase)
+router.delete('/court/file-case', removeFiledCase);
+
+// Register case
+router.post('/court/register-case', registerCase);
+router.put('/court/register-case', updateRegisteredCase);
+router.delete('/court/register-case', removeRegisteredCase);
+
+
+
 
 module.exports = router;

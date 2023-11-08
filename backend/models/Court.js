@@ -26,7 +26,7 @@ const CourtSchema = new mongoose.Schema({
         required: [true, 'court name is required!'],
     },
     location: {
-        pin: Number,
+        pin: String,
         state: String,
         city: String,
         address: String,
