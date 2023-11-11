@@ -64,7 +64,7 @@ exports.handleLogin = async (req, res) => {
                 }
             },
             process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: '10s' }
+            { expiresIn: '30s' }
         );
         const refreshToken = jwt.sign(
             { "jobId": foundUser.jobId },
@@ -74,11 +74,12 @@ exports.handleLogin = async (req, res) => {
         // Saving refreshToken with current user
         foundUser.refreshToken = refreshToken;
         const result = await foundUser.save();
-        console.log(result);
-        console.log(roles);
+        // console.log(result);
+        // console.log(roles);
 
         // Creates Secure Cookie with refresh token
         res.cookie('jwt', refreshToken, { httpOnly: true, secure: true, sameSite: 'None', maxAge: 24 * 60 * 60 * 1000 });
+        // res.cookie('jwt', refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
 
         // Send authorization roles and access token to user
         res.json({ roles, accessToken });
@@ -92,6 +93,7 @@ exports.handleLogout = async (req, res) => {
     // On client, also delete the accessToken
 
     const cookies = req.cookies;
+    // console.log(cookies);
     if (!cookies?.jwt) return res.sendStatus(204); //No content
     const refreshToken = cookies.jwt;
 
@@ -116,6 +118,7 @@ exports.handleRefreshToken = async (req, res) => {
     console.log("cookies -> ",cookies);
     if (!cookies?.jwt) return res.sendStatus(401);
     const refreshToken = cookies.jwt;
+    console.log(refreshToken);
 
     const foundUser = await User.findOne({ refreshToken }).exec();
     if (!foundUser) return res.sendStatus(403); //Forbidden 
@@ -136,7 +139,7 @@ exports.handleRefreshToken = async (req, res) => {
                     }
                 },
                 process.env.ACCESS_TOKEN_SECRET,
-                { expiresIn: '10s' }
+                { expiresIn: '30s' }
             );
             res.json({ roles, accessToken })
         }
