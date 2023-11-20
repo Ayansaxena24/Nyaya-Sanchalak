@@ -31,6 +31,17 @@ const CourtSchema = new mongoose.Schema({
         city: String,
         address: String,
     },
+
+    // cases: [
+    //     {
+    //         caseId: ObjectId,
+    //         ref: 'RegisteredCase'
+    //     }
+    // ], 
+
+    // scheduledCases: [
+
+    // ]
     
 }, {timestamps: true});
 

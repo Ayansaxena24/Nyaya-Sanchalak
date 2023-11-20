@@ -308,7 +308,10 @@ const registeredCaseSchema = new mongoose.Schema({
         }
     ],
 
-    
+    courtId: {
+        type: ObjectId,
+        ref: 'Court'
+    }
 }, {timestamps: true});
 
 module.exports = mongoose.model('RegisteredCase', registeredCaseSchema);

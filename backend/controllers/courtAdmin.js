@@ -18,8 +18,23 @@ exports.getFiledCase = async (req, res) => {
 // create
 exports.fileCase = async (req, res) => {
     try {
-        const data = req.body;
-        const response = await FiledCase.create(data);
+        // const data = req.body;
+        // const response = await FiledCase.create(data);
+        const {category, caseType, plaintiffDetails, defendantDetails, valuation, amount, filingDateAndTime} = req.body;
+
+        const date = new Date(filingDateAndTime);
+
+        const districtCode = 'UP'
+        const establishmentCode = 'LL05'
+        const caseFilingNum = ''
+        const yearOfCaseFiling = date.getFullYear();
+
+        let filingNum = a + '/' + b + '/' + yearOfCaseFiling
+        let cnrNum = districtCode + '-' + establishmentCode + '-' + caseFilingNum + '-' + yearOfCaseFiling;
+
+        const response = await FiledCase.create({
+            category, caseType, plaintiffDetails, defendantDetails, valuation, amount, filingDateAndTime, filingNum, cnrNum
+        });
         res.status(200).json({
             success: true,
             response

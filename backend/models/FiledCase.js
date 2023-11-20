@@ -77,6 +77,13 @@ const filedCaseSchema = new mongoose.Schema({
     },
     filingDateAndTime: {
         type: Date,
+    },
+
+    filingNum: {
+        type: String,
+    },
+    cnrNum: {
+        type: String,
     }
 }, {timestamps: true});
 
