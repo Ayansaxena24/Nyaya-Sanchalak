@@ -304,13 +304,23 @@ const registeredCaseSchema = new mongoose.Schema({
             court: {
                 type: ObjectId,
                 ref: 'Court',
-            }
+            },
+            score: Number,
         }
     ],
 
     courtId: {
         type: ObjectId,
         ref: 'Court'
+    },
+
+    prevScore: {
+        type: Number,
+        default: 0,
+    },
+    currScore: {
+        type: Number,
+        default: 0,
     }
 }, {timestamps: true});
 
