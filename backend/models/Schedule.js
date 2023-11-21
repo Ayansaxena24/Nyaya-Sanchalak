@@ -2,19 +2,24 @@ const mongoose = require('mongoose');
 const {ObjectId} = mongoose.Schema;
 
 const scheduleSchema = new mongoose.Schema({
-    case: {
-        type: ObjectId,
-        ref: 'RegisteredCase',
-        required: [true, 'case _id is required!']
-    },
-    dateAndTime: {
-        type: Date,
-        required: [true, "case's date and time is required!"],
-    },
+    cases: [
+        {
+            caseId: {
+                type: ObjectId,
+                ref: 'RegisteredCase',
+                required: [true, 'case _id is required!']
+            },
+            dateAndTime: {
+                type: Date,
+                required: [true, "case's date and time is required!"],
+            },
+        }  
+    ],
+    
     judge: {
         type: ObjectId,
         ref: 'User',
-        required: [true, "judge _id is required!"],
+        // required: [true, "judge _id is required!"],
     },
     court: {
         type: ObjectId,
