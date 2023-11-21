@@ -27,7 +27,7 @@ const filedCaseSchema = new mongoose.Schema({
                 type: String,
                 required: [true, 'plaintiff age is required!'],
             },
-            extraPetitionerCnt: Number,
+            extraPetitionerCnt: String,
             mobile: {
                 type: String,
                 required: [true, 'plaintiff mobile no. is required!'],
@@ -61,7 +61,7 @@ const filedCaseSchema = new mongoose.Schema({
                 type: String,
                 required: [true, 'defendant age is required!'],
             },
-            extraPetitionerCnt: Number,
+            extraPetitionerCnt: String,
             mobile: {
                 type: String,
                 required: [true, 'defendant mobile no. is required!'],
@@ -73,10 +73,17 @@ const filedCaseSchema = new mongoose.Schema({
         type: String,
     },
     amount: {
-        type: Number,
+        type: String,
     },
     filingDateAndTime: {
         type: Date,
+    },
+
+    filingNum: {
+        type: String,
+    },
+    cnrNum: {
+        type: String,
     }
 }, {timestamps: true});
 
