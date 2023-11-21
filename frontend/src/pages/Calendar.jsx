@@ -1,6 +1,7 @@
 import React from "react";
 
 import {
+  ScheduleComponent,
   ViewsDirective,
   ViewDirective,
   Day,
@@ -12,7 +13,7 @@ import {
   Resize,
   DragAndDrop,
 } from "@syncfusion/ej2-react-schedule";
-import { ScheduleComponent } from "@syncfusion/ej2-react-schedule";
+
 import { scheduleData } from "../assets/data/data.js";
 import { Link } from "react-router-dom";
 import logo from "../assets/Images/ministryLogo.jpg";
@@ -21,7 +22,6 @@ import { BsFillTriangleFill } from "react-icons/bs";
 const Calendar = () => {
   return (
     <div className="h-[100vh] flex justify-start items-start bg-white">
-
       {/* --------------------------------------------------SIDEBAR-------------------------------------------------------------- */}
       <div className="flex flex-col min-w-[300px] justify-between bg-[#E1EEDD] h-screen pl-4 pr-2 pt-2">
         <div>
@@ -42,7 +42,7 @@ const Calendar = () => {
               </div>
               <div className="flex pt-8 pl-4 hover:text-green-600 hover:border-green-600 duration-300 ease-in-out">
                 <p>--</p>
-                <p className="pl-2"> View Daily Schedule </p>
+                <p className="pl-2"> <Link to="/dailycalendar"> View Daily Schedule </Link></p>
               </div>
               <p className="pt-0 hover:text-green-600 hover:border-green-600 duration-300 ease-in-out">
                 <Link to="/caseregistration"> Case Registration </Link>
@@ -66,11 +66,7 @@ const Calendar = () => {
         <div className="flex justify-center items-center">
           <h1 className="font-bold text-4xl text-black mb-2">Calendar</h1>
         </div>
-        <ScheduleComponent
-          height={"615px"}
-          eventSettings={{ dataSource: scheduleData }}
-          selectedDate={new Date(2021, 0, 10)}
-        >
+        <ScheduleComponent>
           <Inject
             services={[Day, Week, WorkWeek, Month, Agenda, Resize, DragAndDrop]}
           />
