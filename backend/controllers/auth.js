@@ -14,6 +14,7 @@ exports.currentUser = async (req, res) => {
 };
 
 exports.handleRegister = async (req, res) => {
+    console.log(req.body);
     const { user, password, roles } = req.body;
     if (!user || !password) return res.status(400).json({ 'message': 'Username and password are required.' });
 

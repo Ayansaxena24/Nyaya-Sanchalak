@@ -10,6 +10,7 @@ import './App.css';
 import Calendar from './pages/Calendar'
 import DailyCalendar from './pages/DailyCalendar'
 import Users from './pages/components/Users'
+import Register from './pages/Auth/Register'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -21,6 +22,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           {/* <Route path="/test" element={<Test />} /> */}
           <Route path="/casefiling" element={<CaseFiling />} />
           <Route path="/caseregistration" element={<CaseRegistration />} />

@@ -1,13 +1,18 @@
 import React from 'react'
 import { useState } from 'react'
-import axios from "../api/axios";
+// import axios from "../api/axios";
+import useAxiosPrivate from '../../hooks/useAxiosPrivate';
 import { useEffect } from 'react';
-import useRefreshToken from '../../hooks/useRefreshToken';
+import { useNavigate, useLocation } from 'react-router-dom';
+// import useRefreshToken from '../../hooks/useRefreshToken';
 
 const Users = () => {
 
     const [ users, setUsers] = useState();
-    const refresh = useRefreshToken();
+    // const refresh = useRefreshToken();
+    const axiosPrivate = useAxiosPrivate();
+    const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
         let isMounted = true; // note this flag denote mount status
@@ -15,7 +20,7 @@ const Users = () => {
 
         const getUsers = async () => {
             try {
-                const response = await axios.get('/users', { 
+                const response = await axiosPrivate.get('/users', { 
                     signal: controller.signal 
                 }); 
                 console.log(response.data)
@@ -24,6 +29,7 @@ const Users = () => {
                 }
             } catch (err) {
                 console.log(err);
+                navigate('/login', { state: { from: location }, replace: true});
             }
         }
         getUsers();
@@ -48,7 +54,7 @@ const Users = () => {
             )
         }
 
-        <button onClick={() => refresh()} className='rounded-md border-2 px-4 py-1 hover:bg-green-200 duration-300 ease-in-out'>Refresh</button>
+        {/* <button onClick={() => refresh()} className='rounded-md border-2 px-4 py-1 hover:bg-green-200 duration-300 ease-in-out'>Refresh</button> */}
         <br />
     </div>
   )
