@@ -1,6 +1,6 @@
 const ROLES_LIST = {
-    "Judge": 9999,
-    "CourtAdmin": 8888,
+    "Judge": 8888,
+    "CourtAdmin": 9999,
 }
 
 module.exports = ROLES_LIST
