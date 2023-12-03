@@ -10,7 +10,7 @@ const registeredCaseSchema = new mongoose.Schema({
         complainant: {
             type: String,
         },
-        extraPetitionerCnt: Number,
+        extraPetitionerCnt: String,
         advocate: {
             name: {
                 type: String
@@ -24,7 +24,7 @@ const registeredCaseSchema = new mongoose.Schema({
         },
         location: {
             address: String,
-            pincode: Number,
+            pincode: String,
             district: String,
             town: String,
             ward: String,
@@ -34,7 +34,7 @@ const registeredCaseSchema = new mongoose.Schema({
             type: String,
         },
         uidNum: {
-            type: Number,
+            type: String,
         }
     },
     respondent: {
@@ -63,7 +63,7 @@ const registeredCaseSchema = new mongoose.Schema({
         caste: {
             type: String,
         },
-        extraPetitionerCnt: Number,
+        extraPetitionerCnt: String,
         proformaRespondent: {
             type: Boolean,
         },
@@ -74,7 +74,7 @@ const registeredCaseSchema = new mongoose.Schema({
         },
         location: {
             address: String,
-            pincode: Number,
+            pincode: String,
             district: String,
             town: String,
             ward: String,
@@ -99,14 +99,14 @@ const registeredCaseSchema = new mongoose.Schema({
                 type: String,
             },
             phone: {
-                type: Number,
+                type: String,
             },
             occupation: {
                 type: String,
             },
             alternateLocation: {
                 address: String,
-                // pincode: Number,
+                // pincode: String,
                 district: String,
                 town: String,
                 ward: String,
@@ -132,14 +132,14 @@ const registeredCaseSchema = new mongoose.Schema({
                 type: String,
             },
             phone: {
-                type: Number,
+                type: String,
             },
             occupation: {
                 type: String,
             },
             alternateLocation: {
                 address: String,
-                // pincode: Number,
+                // pincode: String,
                 district: String,
                 town: String,
                 ward: String,
@@ -171,11 +171,11 @@ const registeredCaseSchema = new mongoose.Schema({
         firType: {
             type: String,
         },
-        firNumber: {
+        firString: {
             type: String,
         },
         year: {
-            type: Number,
+            type: String,
         },
         investigatingOfficer: {
             type: String,
@@ -218,14 +218,14 @@ const registeredCaseSchema = new mongoose.Schema({
             type: String,
         },
         age: {
-            type: Number,
+            type: String,
         },
         advocate: {
             name: String,
             barRegNum: String,
             email: String,
         },
-        mobile: Number,
+        mobile: String,
         occupation: {
             type: String,
         },
@@ -234,7 +234,7 @@ const registeredCaseSchema = new mongoose.Schema({
         },
         location: {
             address: String,
-            pincode: Number,
+            pincode: String,
             district: String,
             town: String,
             ward: String,
@@ -254,7 +254,7 @@ const registeredCaseSchema = new mongoose.Schema({
             type: String
         },
         amount: {
-            type: Number,
+            type: String,
         },
         filingDateAndTime: {
             type: Date,
@@ -262,13 +262,65 @@ const registeredCaseSchema = new mongoose.Schema({
         mainMatterInfo: {
             caseType: String,
             caseNum: String,
-            year: Number,
+            year: String,
             cnrNum: String,
         },
     },
     registration: {
         caseType: String,
         nature: String,
+    },
+
+    caseInfo: {
+        caseType: String,
+        caseNum: String,
+        caseYear: String,
+        filingNum:String,
+        filingDate: Date,
+        regNum: String,
+        regDate: Date,
+        cnrNum: String,
+
+        caseDesc: String,
+        petitionerAndAdvocate: {
+            petitioner: String,
+            advocate: String,
+        },
+        respondentAndAdvocate: {
+            respondent: String,
+            advocate: String,
+        },
+    },
+
+    caseStatus: {
+        type: String,
+        default: 'pending',
+        enum: ['pending', ''],
+    },
+    caseHistory: [
+        {
+            status: String,
+            date: Date,
+            court: {
+                type: ObjectId,
+                ref: 'Court',
+            },
+            score: Number,
+        }
+    ],
+
+    courtId: {
+        type: ObjectId,
+        ref: 'Court'
+    },
+
+    prevScore: {
+        type: Number,
+        default: 0,
+    },
+    currScore: {
+        type: Number,
+        default: 0,
     }
 }, {timestamps: true});
 
