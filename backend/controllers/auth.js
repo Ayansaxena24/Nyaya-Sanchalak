@@ -14,8 +14,10 @@ const bcrypt = require('bcrypt');
 // };
 
 exports.handleRegister = async (req, res) => {
+
     const { jobId, name, password, roles, court } = req.body;
     if (!jobId || !name || !password) return res.status(400).json({ 'message': 'JobID, name and password are required.' });
+
 
     // check for duplicate usernames in the db
     const duplicate = await User.findOne({ jobId: jobId }).exec();

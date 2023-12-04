@@ -46,7 +46,7 @@ const CaseRegistration = () => {
               </div>
               <div className="flex pl-4 hover:text-green-600 hover:border-green-600 duration-300 ease-in-out">
                 <p>--</p>
-                <p className="pl-2"> View Daily Schedule </p>
+                <p className="pl-2"> <Link to="/dailycalendar"> View Daily Schedule </Link></p>
               </div>
               <p className="absolute pl-4 left-0 duration-300 ease-in-out w-[300px] bg-green-300">
                 Case Registration

@@ -21,7 +21,7 @@ function Home() {
             </div>
             <div className="flex pl-4 hover:text-green-600 hover:border-green-600 duration-300 ease-in-out">
               <p>--</p>
-              <p className="pl-2"> View Daily Schedule </p>
+              <p className="pl-2"> <Link to="/dailycalendar"> View Daily Schedule </Link></p>
             </div>
             <p className="hover:text-green-600 hover:border-green-600 duration-300 ease-in-out"> <Link to="/caseregistration"> Case Registration </Link></p>
             <p className="hover:text-green-600 hover:border-green-600 duration-300 ease-in-out"> <Link to="/casefiling"> Case Filing </Link></p>
