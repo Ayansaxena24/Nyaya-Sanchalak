@@ -3,6 +3,7 @@ const Court = require("../models/Court");
 const Schedule = require("../models/Schedule");
 
 exports.getSchedule = async (req, res) => {
+<<<<<<< HEAD
   try {
     const { courtId } = req.body;
     const schedule = await Schedule.find({
@@ -12,6 +13,21 @@ exports.getSchedule = async (req, res) => {
       .populate("courtId")
       .sort("dateAndTime")
       .exec();
+=======
+    
+    try {
+        const {courtId} = req.body;
+
+        await schedulingAlgo(courtId);
+
+        const schedule = await Schedule.findOne({
+            court: courtId
+        })
+        .populate('case')
+        .populate('courtId')
+        .sort('dateAndTime')
+        .exec();
+>>>>>>> 8c48015d6f858b8f1a6030bd3cac49fad709e778
 
     res.status(200).json(schedule);
   } catch (error) {
@@ -20,8 +36,13 @@ exports.getSchedule = async (req, res) => {
   }
 };
 
+<<<<<<< HEAD
 exports.schedulingAlgo = async (courtId) => {
   // TODO - Schedule cases of a particular court
+=======
+const schedulingAlgo = async (courtId) => {
+    // TODO - Schedule cases of a particular court
+>>>>>>> 8c48015d6f858b8f1a6030bd3cac49fad709e778
 
   try {
     const cases = await RegisteredCase.find({
@@ -58,6 +79,7 @@ exports.schedulingAlgo = async (courtId) => {
 
 // score
 const assignScore = async (cases) => {
+<<<<<<< HEAD
   try {
     for (const caseItem of cases) {
       const caseDate = caseItem.caseInfo.regDate;
@@ -80,6 +102,26 @@ const assignScore = async (cases) => {
         prevScore: prevScore,
         currScore: currScore,
       });
+=======
+    try {
+        for (const caseItem of cases) {
+            const caseDate = caseItem.caseInfo.regDate;
+            const currDate = new Date();
+            const prevScore = caseItem.currScore; 
+            const track = getTrack();
+            const constFactor = getConstFactor();
+            const statement = caseItem.caseInfo.caseDesc;
+    
+            const currScore = getTotalScore(caseDate, currDate, prevScore, track, constFactor, statement);
+    
+            const result = await RegisteredCase.findByIdAndUpdate(caseItem._id, {
+                prevScore: prevScore,
+                currScore: currScore,
+            })
+        }
+    } catch (error) {
+        console.log(error);
+>>>>>>> 8c48015d6f858b8f1a6030bd3cac49fad709e778
     }
   } catch (error) {
     console.log(error);
@@ -134,6 +176,7 @@ const getDateScore = (caseDate, currDate, constFactor) => {
 };
 
 const getTrackScore = (track) => {
+<<<<<<< HEAD
   switch (track) {
     case 1:
       return 10;
@@ -145,6 +188,19 @@ const getTrackScore = (track) => {
       return 0;
   }
 };
+=======
+    switch (track) {
+        case 1:
+            return 1;
+        case 2:
+            return 3;
+        case 3:
+            return 5;
+        default:
+            return 0;
+    }
+}
+>>>>>>> 8c48015d6f858b8f1a6030bd3cac49fad709e778
 
 const getSeverityScore = (statement) => {
   // TODO - connect with python model to get severity score
@@ -250,8 +306,38 @@ const assignTimeSlots = (schedule) => {
     return startTime;
   }
 
+<<<<<<< HEAD
   // Calculate the start time of the new case (after the last case)
   const nextStartTime = lastCase.dateAndTime.getTime() + caseDuration;
+=======
+
+    const lastCaseDateAndTimeObj = new Date(lastCase.dateAndTime);
+    // Calculate the start time of the new case (after the last case)
+    // const nextStartTime = lastCase.dateAndTime.getTime() + caseDuration;
+    const nextStartTime = lastCaseDateAndTimeObj.getTime() + caseDuration;
+
+    // Check if the new case can be scheduled on the same day within the specified time range
+    if (
+        // startTime.getDate() === lastCase.dateAndTime.getDate() &&
+        startTime.getDate() === lastCaseDateAndTimeObj.getDate() &&
+        nextStartTime.getHours() >= startTimeRange &&
+        nextStartTime.getHours() < endTimeRange
+    ) {
+        // Return the start time as a Date object for the same day
+        return new Date(nextStartTime);
+    }
+
+    // If the new case needs to be scheduled on the next day, set the time to the start of the next day
+    const nextDayStartTime = new Date(
+        startTime.getFullYear(),
+        startTime.getMonth(),
+        startTime.getDate() + 1,
+        startTimeRange
+    );
+
+    return nextDayStartTime;
+}
+>>>>>>> 8c48015d6f858b8f1a6030bd3cac49fad709e778
 
   // Check if the new case can be scheduled on the same day within the specified time range
   if (
