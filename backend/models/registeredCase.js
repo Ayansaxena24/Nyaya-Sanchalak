@@ -298,7 +298,6 @@ const registeredCaseSchema = new mongoose.Schema(
       enum: ["pending", ""],
     },
     caseHistory: [
-<<<<<<< HEAD
       {
         status: String,
         date: Date,
@@ -306,6 +305,7 @@ const registeredCaseSchema = new mongoose.Schema(
           type: ObjectId,
           ref: "Court",
         },
+        score: Number,
       },
     ],
 
@@ -313,39 +313,17 @@ const registeredCaseSchema = new mongoose.Schema(
       type: ObjectId,
       ref: "Court",
     },
-    score: {
+
+    prevScore: {
       type: Number,
-      defualt: 0,
+      default: 0,
+    },
+    currScore: {
+      type: Number,
+      default: 0,
     },
   },
   { timestamps: true }
 );
-=======
-        {
-            status: String,
-            date: Date,
-            court: {
-                type: ObjectId,
-                ref: 'Court',
-            },
-            score: Number,
-        }
-    ],
-
-    courtId: {
-        type: ObjectId,
-        ref: 'Court'
-    },
-
-    prevScore: {
-        type: Number,
-        default: 0,
-    },
-    currScore: {
-        type: Number,
-        default: 0,
-    }
-}, {timestamps: true});
->>>>>>> 9de2f54c1752926db19dfb78658986848451316a
 
 module.exports = mongoose.model("RegisteredCase", registeredCaseSchema);
