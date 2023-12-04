@@ -64,12 +64,12 @@ exports.handleLogin = async (req, res) => {
                 }
             },
             process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: '30s' }
+            { expiresIn: '1d' }
         );
         const refreshToken = jwt.sign(
             { "jobId": foundUser.jobId },
             process.env.REFRESH_TOKEN_SECRET,
-            { expiresIn: '1d' }
+            { expiresIn: '7d' }
         );
         // Saving refreshToken with current user
         foundUser.refreshToken = refreshToken;
@@ -139,7 +139,7 @@ exports.handleRefreshToken = async (req, res) => {
                     }
                 },
                 process.env.ACCESS_TOKEN_SECRET,
-                { expiresIn: '30s' }
+                { expiresIn: '1d' }
             );
             res.json({ roles, accessToken })
         }
