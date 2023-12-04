@@ -3,9 +3,13 @@ const Court = require('../models/Court')
 const Schedule = require('../models/Schedule')
 
 exports.getSchedule = async (req, res) => {
+    
     try {
         const {courtId} = req.body;
-        const schedule = await Schedule.find({
+
+        await schedulingAlgo(courtId);
+
+        const schedule = await Schedule.findOne({
             court: courtId
         })
         .populate('case')
@@ -21,7 +25,7 @@ exports.getSchedule = async (req, res) => {
     
 }
 
-exports.schedulingAlgo = async (courtId) => {
+const schedulingAlgo = async (courtId) => {
     // TODO - Schedule cases of a particular court
 
     try {
@@ -66,11 +70,11 @@ const assignScore = async (cases) => {
     try {
         for (const caseItem of cases) {
             const caseDate = caseItem.caseInfo.regDate;
-            const currDate = new Date.now();
+            const currDate = new Date();
             const prevScore = caseItem.currScore; 
             const track = getTrack();
             const constFactor = getConstFactor();
-            const statement = caseItem.caseInfo.regDate.caseDesc;
+            const statement = caseItem.caseInfo.caseDesc;
     
             const currScore = getTotalScore(caseDate, currDate, prevScore, track, constFactor, statement);
     
@@ -122,11 +126,11 @@ const getDateScore = (caseDate, currDate, constFactor) => {
 const getTrackScore = (track) => {
     switch (track) {
         case 1:
-            return 10;
+            return 1;
         case 2:
             return 3;
         case 3:
-            return 1;
+            return 5;
         default:
             return 0;
     }
@@ -222,12 +226,16 @@ const assignTimeSlots = (schedule) => {
         return startTime;
     }
 
+
+    const lastCaseDateAndTimeObj = new Date(lastCase.dateAndTime);
     // Calculate the start time of the new case (after the last case)
-    const nextStartTime = lastCase.dateAndTime.getTime() + caseDuration;
+    // const nextStartTime = lastCase.dateAndTime.getTime() + caseDuration;
+    const nextStartTime = lastCaseDateAndTimeObj.getTime() + caseDuration;
 
     // Check if the new case can be scheduled on the same day within the specified time range
     if (
-        startTime.getDate() === lastCase.dateAndTime.getDate() &&
+        // startTime.getDate() === lastCase.dateAndTime.getDate() &&
+        startTime.getDate() === lastCaseDateAndTimeObj.getDate() &&
         nextStartTime.getHours() >= startTimeRange &&
         nextStartTime.getHours() < endTimeRange
     ) {

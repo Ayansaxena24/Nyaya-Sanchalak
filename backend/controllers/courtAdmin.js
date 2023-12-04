@@ -1,6 +1,10 @@
+const uniqid = require('uniqid')
+
 const User = require('../models/User');
 const FiledCase = require('../models/FiledCase');
 const RegisteredCase = require('../models/RegisteredCase');
+const {stateMap} = require('../constants/index')
+
 
 // ----------------------------------- File case -------------------------------------------
 
@@ -24,12 +28,14 @@ exports.fileCase = async (req, res) => {
 
         const date = new Date(filingDateAndTime);
 
-        const districtCode = 'UP'
+        // TODO --
+        const districtCode = stateMap.get('Uttar Pradesh')
+        
         const establishmentCode = 'LL05'
-        const caseFilingNum = ''
+        const caseFilingNum = uniqid();
         const yearOfCaseFiling = date.getFullYear();
 
-        let filingNum = a + '/' + b + '/' + yearOfCaseFiling
+        let filingNum = caseFilingNum + '/' + establishmentCode + '/' + yearOfCaseFiling
         let cnrNum = districtCode + '-' + establishmentCode + '-' + caseFilingNum + '-' + yearOfCaseFiling;
 
         const response = await FiledCase.create({
