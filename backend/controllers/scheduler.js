@@ -92,9 +92,9 @@ const assignScore = async (cases) => {
 const getTotalScore = (
   caseDate,
   currDate,
-  prevScore,
+  // prevScore,
   track,
-  constFactor,
+  // constFactor,
   statement
 ) => {
   // 1. dateScore
@@ -110,31 +110,60 @@ const getTotalScore = (
   const judgeScore = getJudgeScore();
 
   // 5. agingScore
-  const agingScore = getAgingScore();
+  // const agingScore = getAgingScore();
 
   // totalScore
-  const totalScore =
-    prevScore +
-    dateScore +
-    trackScore +
-    severityScore +
-    judgeScore +
-    agingScore;
+  const totalScore = scoreCaluclateByTime;
+  trackScore + severityScore + judgeScore;
+  // agingScore;
+
+  // Prev score ko hatana padsakta hai verna high priority hamesha hi high pe rahega last score add up hoga isliye
 
   return totalScore;
 };
 
-const getDateScore = (caseDate, currDate, constFactor) => {
-  const date1 = new Date(caseDate);
-  const date2 = new Date(currDate);
-  const differenceInMs = Math.abs(date2 - date1);
-  const differenceInDays = Math.round(differenceInMs / (1000 * 60 * 60 * 24));
+const url = "/cases";
 
-  // dateScore
-  const dateScore = differenceInDays * constFactor;
+const fetchDataeScore = async () => {
+  try {
+    const response = await fetch(url);
+    const cases = response.data;
 
-  return dateScore;
+    cases.forEach((caseData) => {
+      const caseId = caseData.caseId;
+      const dateOfFile = caseData.dateOfFile;
+      const currentDate = new Date();
+
+      const monthsDifference =
+        (currentDate.getFullYear() - dateOfFile.getFullYear()) * 12 +
+        (currentDate.getMonth() - dateOfFile.getMonth());
+
+      const yearsDifference = Math.floor(monthsDifference / 12);
+      const scoregenerated = monthsDifference * 1 + yearsDifference * 2;
+
+      //
+      return scoregenerated;
+    });
+  } catch (error) {
+    console.log(error);
+  }
+
+  // Yaha se scoregenerated return krva denge
 };
+
+const scoreCaluclateByTime = fetchDataeScore();
+
+// const getDateScore = (caseDate, currDate, constFactor) => {
+//   const date1 = new Date(caseDate);
+//   const date2 = new Date(currDate);
+//   const differenceInMs = Math.abs(date2 - date1);
+//   const differenceInDays = Math.round(differenceInMs / (1000 * 60 * 60 * 24));
+
+//   // dateScore
+//   const dateScore = differenceInDays * constFactor;
+
+//   return dateScore;
+// };
 
 const getTrackScore = (track) => {
   switch (track) {
@@ -156,6 +185,9 @@ const getSeverityScore = (statement) => {
 
 const getJudgeScore = () => {
   // TODO - decide the score if judge will sort the cases
+
+  // Yaha pe ek factor database mai dalna padega ki if judge factor= then only return 999 verna return 0
+
   return 999;
 };
 
@@ -163,9 +195,9 @@ const getAgingScore = () => {
   return 5;
 };
 
-const getConstFactor = () => {
-  return 2;
-};
+// const getConstFactor = () => {
+//   return 2;
+// };
 
 const getTrack = () => {
   return 1;
