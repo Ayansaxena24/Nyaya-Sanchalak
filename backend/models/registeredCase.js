@@ -52,7 +52,7 @@ const registeredCaseSchema = new mongoose.Schema({
         },
         gender: {
             type: String,
-            enum: ['male', 'female', 'other'],
+            // enum: ['male', 'female', 'other'],
         },
         age: {
             type: String,
@@ -79,6 +79,11 @@ const registeredCaseSchema = new mongoose.Schema({
             town: String,
             ward: String,
             taluka: String,
+            village: String,
+        },
+        policeStation: {
+            policeStationCode: String,
+            uidNum: String,
         }
     },
     extraInfo: {
@@ -171,7 +176,7 @@ const registeredCaseSchema = new mongoose.Schema({
         firType: {
             type: String,
         },
-        firString: {
+        firNumber: {
             type: String,
         },
         year: {
@@ -199,14 +204,14 @@ const registeredCaseSchema = new mongoose.Schema({
     extraParty: {
         type: {
             type: String,
-            enum: ['complaint', 'accused'],
+            // enum: ['complaint', 'accused'],
         },
         complainantOrAccused: {
             type: String,
         },
         gender: {
             type: String,
-            enum: ['male', 'female', 'other'],
+            // enum: ['male', 'female', 'other'],
         },
         relation: {
             type: String,
@@ -294,8 +299,8 @@ const registeredCaseSchema = new mongoose.Schema({
 
     caseStatus: {
         type: String,
-        default: 'pending',
-        enum: ['pending', ''],
+        default: 'registered',
+        enum: ['registered', 'pending', 'closed'],
     },
     caseHistory: [
         {

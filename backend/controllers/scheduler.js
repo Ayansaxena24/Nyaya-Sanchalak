@@ -1,19 +1,31 @@
+const schedule = require('node-schedule');
+
 const RegisteredCase = require('../models/RegisteredCase')
 const Court = require('../models/Court')
 const Schedule = require('../models/Schedule')
+
+
+// const interval = '0 0 */3 * *'; // every 3 days
+// const interval = '0 */2 * * *';  // every 2 hrs
+const interval = '*/1 * * * *'; // Schedule interval (every 1 minute);
+// const interval = '*/2 * * * * *'; // Schedule interval (every 2 seconds)
+// const interval = '0 0 * * *'; // Schedule interval (every day at midnight)
+// const interval = '0 0 * * 0'; // Schedule interval (every week on Sunday at midnight)
+
+
 
 exports.getSchedule = async (req, res) => {
     
     try {
         const {courtId} = req.body;
 
-        await schedulingAlgo(courtId);
+        // await schedulingAlgo(courtId);
 
         const schedule = await Schedule.findOne({
             court: courtId
         })
-        .populate('case')
-        .populate('courtId')
+        .populate('cases.caseId')
+        .populate('court')
         .sort('dateAndTime')
         .exec();
 
@@ -25,12 +37,55 @@ exports.getSchedule = async (req, res) => {
     
 }
 
+exports.removeSchedule = async (req, res) => {
+    try {
+        const {courtId} = req.body;
+
+        const schedule = await Schedule.findOneAndDelete({
+            court: courtId
+        })
+        .exec();
+
+        res.status(200).json(schedule);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json('Internal server error!')
+    }
+}
+
+exports.updateSchedule = async (req, res) => {
+    try {
+        
+    } catch (error) {
+        console.log(error);
+        res.status(500).json('Internal server error!')
+    }
+}
+
+
+
+// -----------------------------------------------------------------------------------------------------------------------------
+
+
+// TODO- MUST 
 const schedulingAlgo = async (courtId) => {
-    // TODO - Schedule cases of a particular court
+    // Schedule cases of a particular court
 
     try {
+
+        // Deleting old schedule
+        // const deletedSchedules = await Schedule.deleteMany({
+        //     court: courtId,
+        // })
+        const deletedSchedule = await Schedule.findOneAndDelete({
+            court: courtId
+        }).exec();
+
+        // Fetching all registered & pending cases
         const cases = await RegisteredCase.find({
-            courtId
+            courtId,
+            // caseStatus: 'pending',
+            caseStatus: { $in: ['pending', 'registered'] }
         }).exec();
     
         if (cases.length <= 0) {
@@ -38,28 +93,14 @@ const schedulingAlgo = async (courtId) => {
             return;
         }
 
-        assignScore(cases);
-        scheduleCases(courtId, cases);
+        await assignScore(cases);
+        await scheduleCases(courtId, cases);
 
     } catch (error) {
         console.log(error);
     }
 
-    // input req
-
-    // 1. last date of hearing / rigistration date
-    // 2. last score (if heared)
-    // 3. current date
-    // 4. severity score
-    // 5. track
-    // 6. case _id
-    // 7. court _id
-    // 8. constFactor
-    // 9. case statement
-    // 10. Judge sorting score
-    // 11. Aging score (for removing starvation)
 }
-
 
 // --------------------> utility functions <---------------------------
 
@@ -72,6 +113,7 @@ const assignScore = async (cases) => {
             const caseDate = caseItem.caseInfo.regDate;
             const currDate = new Date();
             const prevScore = caseItem.currScore; 
+            // const prevScore = caseItem.prevScore; 
             const track = getTrack();
             const constFactor = getConstFactor();
             const statement = caseItem.caseInfo.caseDesc;
@@ -103,7 +145,8 @@ const getTotalScore = (caseDate, currDate, prevScore, track, constFactor, statem
     const judgeScore = getJudgeScore();
 
     // 5. agingScore
-    const agingScore = getAgingScore();
+    // const agingScore = getAgingScore();
+    const agingScore = 0;
 
     // totalScore
     const totalScore = prevScore + dateScore + trackScore + severityScore + judgeScore + agingScore;
@@ -136,14 +179,18 @@ const getTrackScore = (track) => {
     }
 }
 
+
+// TODO
 const getSeverityScore = (statement) => {
     // TODO - connect with python model to get severity score
-    return 0;
+    return 5;
 }
 
+
+// TODO
 const getJudgeScore = () => {
     // TODO - decide the score if judge will sort the cases
-    return 999;
+    return 0;
 }
 
 const getAgingScore = () => {
@@ -164,7 +211,7 @@ const scheduleCases = async (courtId, cases) => {
     try {
         
         // Sort cases by priority score (higher score means higher priority)
-        cases.sort((a, b) => b.score - a.score);
+        cases.sort((a, b) => b.currScore - a.currScore);
     
         // // Find the court's schedule or create a new one if not exists
         // let schedule = await Schedule.findOne({ court: courtId }).exec();
@@ -174,8 +221,11 @@ const scheduleCases = async (courtId, cases) => {
         // }
 
         // Find the court's schedule delete it.
-        let schedule = await Schedule.findOneAndDelete({ court: courtId }).exec();
-        schedule = new Schedule({ court: courtId, cases: [] });
+        // let schedule = await Schedule.findOneAndDelete({ court: courtId }).exec();
+
+
+
+        let schedule = new Schedule({ court: courtId, cases: [] });
         
     
         // Iterate over the sorted cases and schedule them
@@ -205,7 +255,8 @@ const assignTimeSlots = (schedule) => {
     const existingCases = schedule.cases;
 
     // Specify the duration needed for each case (in milliseconds)
-    const caseDuration = 1000 * 60 * 60 * 2; // Assuming each case takes 2 hours
+    // const caseDuration = 1000 * 60 * 60 * 2; // Assuming each case takes 2 hours
+    const caseDuration = 1000 * 60 * 60 * 2; // Assuming each case takes 1 hours
 
     // Specify the start and end time for scheduling cases (11:00 AM - 4:00 PM)
     const startTimeRange = 11;
@@ -216,7 +267,12 @@ const assignTimeSlots = (schedule) => {
 
     // Calculate the start time for scheduling three days before the current date
     const today = new Date();
-    const startTime = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 3, startTimeRange);
+    const startTime = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 3, startTimeRange, 0, 0);
+
+    console.log(startTime.getUTCDate());
+    const localStartTime = startTime.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
+    console.log(localStartTime + ", ");
+    // console.log(startTime);
 
     // Find the last scheduled case
     const lastCase = existingCases.length > 0 ? existingCases[existingCases.length - 1] : null;
@@ -229,15 +285,21 @@ const assignTimeSlots = (schedule) => {
 
     const lastCaseDateAndTimeObj = new Date(lastCase.dateAndTime);
     // Calculate the start time of the new case (after the last case)
+    
     // const nextStartTime = lastCase.dateAndTime.getTime() + caseDuration;
     const nextStartTime = lastCaseDateAndTimeObj.getTime() + caseDuration;
+    const nextStartTimeDateObj = new Date(nextStartTime);
 
     // Check if the new case can be scheduled on the same day within the specified time range
     if (
         // startTime.getDate() === lastCase.dateAndTime.getDate() &&
+
         startTime.getDate() === lastCaseDateAndTimeObj.getDate() &&
-        nextStartTime.getHours() >= startTimeRange &&
-        nextStartTime.getHours() < endTimeRange
+        // nextStartTime.getHours() >= startTimeRange &&
+        // nextStartTime.getHours() < endTimeRange
+
+        nextStartTimeDateObj.getHours() >= startTimeRange &&
+        nextStartTimeDateObj.getHours() < endTimeRange
     ) {
         // Return the start time as a Date object for the same day
         return new Date(nextStartTime);
@@ -253,6 +315,22 @@ const assignTimeSlots = (schedule) => {
 
     return nextDayStartTime;
 }
+
+
+
+
+const createAndUpdateSchedules = async () => {
+    const allCourts = await Court.find({}).select('_id');
+
+    for (const court of allCourts) {
+        await schedulingAlgo(court._id);
+    }
+
+
+}
+
+// Schedule the function to run at the specified interval
+schedule.scheduleJob(interval, createAndUpdateSchedules);
 
 
 
