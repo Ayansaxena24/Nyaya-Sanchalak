@@ -71,22 +71,38 @@ const Register = () => {
     // }
     try {
       let roleName = "";
+      let data = {
+        jobId,
+        name: validName,
+        password,
+        roles: {
+
+        },
+        court,
+      };
       if (role === "9999") {
-        roleName = "Judge";
+        // roleName = "Judge";
+        data.roles = {
+          'Judge': role,
+        };
       } else if (role === "8888") {
-        roleName = "CourtAdmin";
+        // roleName = "CourtAdmin";
+        data.roles = {
+          'CourtAdmin': role,
+        };
       }
       const response = await axios.post(
         REGISTER_URL,
-        JSON.stringify({
-          jobId,
-          validName,
-          password,
-          roles: {
-            roleName: roleName,
-          },
-          court,
-        }),
+        // JSON.stringify({
+        //   jobId,
+        //   validName,
+        //   password,
+        //   roles: {
+        //     roleName: roleName,
+        //   },
+        //   court,
+        // }),
+        JSON.stringify(data),
         {
           headers: { "Content-Type": "application/json" },
           withCredentials: true,

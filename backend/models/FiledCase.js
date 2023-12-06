@@ -5,7 +5,7 @@ const {ObjectId} = mongoose.Schema;
 const filedCaseSchema = new mongoose.Schema({
     category: {
         type: String,
-        enum: ['civil', 'criminal'],
+        enum: ['civil', 'criminal', 'ceveatfiling'],
         required: [true, 'case category is required!'],
     },
     caseType: {
@@ -76,7 +76,7 @@ const filedCaseSchema = new mongoose.Schema({
         type: String,
     },
     filingDateAndTime: {
-        type: Date,
+        type: String,
     },
 
     filingNum: {
