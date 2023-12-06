@@ -16,7 +16,7 @@ const bcrypt = require('bcrypt');
 // };
 
 exports.handleRegister = async (req, res) => {
-
+    console.log(req.body);
     const { jobId, name, password, roles, court } = req.body;
     if (!jobId || !name || !password) return res.status(400).json({ 'message': 'JobID, name and password are required.' });
 
@@ -68,12 +68,12 @@ exports.handleLogin = async (req, res) => {
                 }
             },
             process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: '30s' }
+            { expiresIn: '1d' }
         );
         const refreshToken = jwt.sign(
             { "jobId": foundUser.jobId },
             process.env.REFRESH_TOKEN_SECRET,
-            { expiresIn: '1d' }
+            { expiresIn: '7d' }
         );
         // Saving refreshToken with current user
         foundUser.refreshToken = refreshToken;
@@ -143,7 +143,7 @@ exports.handleRefreshToken = async (req, res) => {
                     }
                 },
                 process.env.ACCESS_TOKEN_SECRET,
-                { expiresIn: '30s' }
+                { expiresIn: '1d' }
             );
             res.json({ roles, accessToken })
         }

@@ -24,11 +24,11 @@ const Register = () => {
   const userRef = useRef();
   const errRef = useRef();
 
-  const [user, setUser] = useState("");
-  const [validName, setValidName] = useState(false);
+  const [jobId, setJobId] = useState("");
+  const [validName, setValidName] = useState("");
   const [userFocus, setUserFocus] = useState(false);
 
-  const [pwd, setPwd] = useState("");
+  const [password, setPassword] = useState("");
   const [validPwd, setValidPwd] = useState(false);
   const [pwdFocus, setPwdFocus] = useState(false);
 
@@ -40,47 +40,69 @@ const Register = () => {
   const [success, setSuccess] = useState(false);
 
   const [role, setRole] = useState("");
-  const [court, setCourt] = useState("");
+  const [court, setCourt] = useState("6543a67161a0e93957dd3443");
 
   useEffect(() => {
     userRef.current.focus();
   }, []);
 
-  useEffect(() => {
-    setValidName(USER_REGEX.test(user));
-  }, [user]);
+  // useEffect(() => {
+  //   setValidName(USER_REGEX.test(validName));
+  // }, [validName]);
 
   useEffect(() => {
-    setValidPwd(PWD_REGEX.test(pwd));
-    setValidMatch(pwd === matchPwd);
-  }, [pwd, matchPwd]);
+    setValidPwd(PWD_REGEX.test(password));
+    setValidMatch(password === matchPwd);
+  }, [password, matchPwd]);
 
   useEffect(() => {
     setErrMsg("");
-  }, [user, pwd, matchPwd]);
+  }, [jobId, validName, password, matchPwd]);
 
   const handleSubmit = async (e) => {
     console.log("test-register");
     e.preventDefault();
     // if button enabled with JS hack
-    const v1 = USER_REGEX.test(user);
-    const v2 = PWD_REGEX.test(pwd);
+    const v1 = USER_REGEX.test(jobId);
+    const v2 = PWD_REGEX.test(password);
     // if (!v1 || !v2) {
     //   setErrMsg("Invalid Entry");
     //   return;
     // }
     try {
-      let roleName = ''
+      let roleName = "";
+      let data = {
+        jobId,
+        name: validName,
+        password,
+        roles: {
+
+        },
+        court,
+      };
       if (role === "9999") {
-        roleName = "Judge";
+        // roleName = "Judge";
+        data.roles = {
+          'Judge': role,
+        };
       } else if (role === "8888") {
-        roleName = "CourtAdmin";
+        // roleName = "CourtAdmin";
+        data.roles = {
+          'CourtAdmin': role,
+        };
       }
       const response = await axios.post(
         REGISTER_URL,
-        JSON.stringify({ user, password, roles: {
-          roleName: roleName,
-        }}),
+        // JSON.stringify({
+        //   jobId,
+        //   validName,
+        //   password,
+        //   roles: {
+        //     roleName: roleName,
+        //   },
+        //   court,
+        // }),
+        JSON.stringify(data),
         {
           headers: { "Content-Type": "application/json" },
           withCredentials: true,
@@ -91,7 +113,7 @@ const Register = () => {
       //console.log(JSON.stringify(response))
       setSuccess(true);
       //clear state and controlled inputs
-      setUser("");
+      setJobId("");
       setPwd("");
       setMatchPwd("");
     } catch (err) {
@@ -145,17 +167,34 @@ const Register = () => {
           <div className="flex justify-start flex-col w-full space-y-2">
             <div className="flex flex-col w-full space-y-2">
               <p className="flex justify-start text-center font-semibold">
+                Name*
+              </p>
+              <input
+                className="border-2 border-gray-400 rounded-xl px-2 py-1"
+                placeholder="Enter Name"
+                type="text"
+                id="username"
+                // ref={userRef}
+                autoComplete="off"
+                onChange={(e) => setValidName(e.target.value)}
+                value={validName}
+                required
+              ></input>
+            </div>
+
+            <div className="flex flex-col w-full space-y-2">
+              <p className="flex justify-start text-center font-semibold">
                 Job Id*
               </p>
               <input
                 className="border-2 border-gray-400 rounded-xl px-2 py-1"
                 placeholder="Enter ID"
                 type="text"
-                id="userName"
+                id="jobId"
                 ref={userRef}
                 autoComplete="off"
-                onChange={(e) => setUser(e.target.value)}
-                value={user}
+                onChange={(e) => setJobId(e.target.value)}
+                value={jobId}
                 required
               ></input>
             </div>
@@ -169,8 +208,8 @@ const Register = () => {
                 placeholder="Enter password"
                 type="password"
                 id="password"
-                onChange={(e) => setPwd(e.target.value)}
-                value={pwd}
+                onChange={(e) => setPassword(e.target.value)}
+                value={password}
                 required
                 aria-invalid={validPwd ? "false" : "true"}
                 aria-describedby="pwdnote"
@@ -225,11 +264,12 @@ const Register = () => {
                 className="border-2 border-gray-400 rounded-xl px-2 py-1"
                 placeholder="Select Role"
                 type="text"
-                id="role"
+                id="court"
                 ref={userRef}
                 autoComplete="off"
-                onChange={(e) => setCourt(e.target.value)}
-                value={court}
+                // onChange={(e) => setCourt(e.target.value)}
+                // value={court}
+                defaultValue={court}
                 required
               >
                 <option value="judge">Criminal Court</option>
@@ -248,9 +288,9 @@ const Register = () => {
           </div>
           <div className="flex justify-center flex-col items-center space-y-4 pb-6">
             <button
-            type="submit" 
-            className="rounded-2xl bg-yellow-200 py-1 font-bold w-56 text-center flex justify-center items-center hover:shadow-yellow-200 hover:shadow-sm hover:scale-105 duration-300 ease-in-out"
-            // disabled={!validName || !validPwd || !validMatch ? true : false}
+              type="submit"
+              className="rounded-2xl bg-yellow-200 py-1 font-bold w-56 text-center flex justify-center items-center hover:shadow-yellow-200 hover:shadow-sm hover:scale-105 duration-300 ease-in-out"
+              // disabled={!validName || !validPwd || !validMatch ? true : false}
             >
               SUBMIT
             </button>
