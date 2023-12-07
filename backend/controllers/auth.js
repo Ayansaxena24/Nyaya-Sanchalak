@@ -82,7 +82,7 @@ exports.handleLogin = async (req, res) => {
         // res.cookie('jwt', refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
 
         // Send authorization roles and access token to user
-        res.json({ roles, accessToken });
+        res.json({ roles, accessToken, user: foundUser });
 
     } else {
         res.sendStatus(401);

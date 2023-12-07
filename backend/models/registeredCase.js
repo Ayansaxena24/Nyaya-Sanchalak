@@ -319,11 +319,15 @@ const registeredCaseSchema = new mongoose.Schema({
         ref: 'Court'
     },
 
-    prevScore: {
-        type: Number,
-        default: 0,
-    },
-    currScore: {
+    // prevScore: {
+    //     type: Number,
+    //     default: 0,
+    // },
+    // currScore: {
+    //     type: Number,
+    //     default: 0,
+    // }
+    score: {
         type: Number,
         default: 0,
     }

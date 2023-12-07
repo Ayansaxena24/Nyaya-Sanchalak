@@ -7,44 +7,44 @@ const Schedule = require('../models/Schedule')
 
 // const interval = '0 0 */3 * *'; // every 3 days
 // const interval = '0 */2 * * *';  // every 2 hrs
-const interval = '*/1 * * * *'; // Schedule interval (every 1 minute);
+// const interval = '*/1 * * * *'; // Schedule interval (every 1 minute);
 // const interval = '*/2 * * * * *'; // Schedule interval (every 2 seconds)
-// const interval = '0 0 * * *'; // Schedule interval (every day at midnight)
+const interval = '0 0 * * *'; // Schedule interval (every day at midnight)
 // const interval = '0 0 * * 0'; // Schedule interval (every week on Sunday at midnight)
 
 
 
 exports.getSchedule = async (req, res) => {
-    
+
     try {
-        const {courtId} = req.body;
+        const { courtId } = req.body;
 
         // await schedulingAlgo(courtId);
 
         const schedule = await Schedule.findOne({
             court: courtId
         })
-        .populate('cases.caseId')
-        .populate('court')
-        .sort('dateAndTime')
-        .exec();
+            .populate('cases.caseId')
+            .populate('court')
+            .sort('dateAndTime')
+            .exec();
 
         res.status(200).json(schedule);
     } catch (error) {
         console.log(error);
         res.status(500).json('Internal server error!')
     }
-    
+
 }
 
 exports.removeSchedule = async (req, res) => {
     try {
-        const {courtId} = req.body;
+        const { courtId } = req.body;
 
         const schedule = await Schedule.findOneAndDelete({
             court: courtId
         })
-        .exec();
+            .exec();
 
         res.status(200).json(schedule);
     } catch (error) {
@@ -55,7 +55,7 @@ exports.removeSchedule = async (req, res) => {
 
 exports.updateSchedule = async (req, res) => {
     try {
-        
+
     } catch (error) {
         console.log(error);
         res.status(500).json('Internal server error!')
@@ -67,34 +67,72 @@ exports.updateSchedule = async (req, res) => {
 // -----------------------------------------------------------------------------------------------------------------------------
 
 
-// TODO- MUST 
+// Schedule cases of a particular court
 const schedulingAlgo = async (courtId) => {
-    // Schedule cases of a particular court
 
     try {
 
-        // Deleting old schedule
-        // const deletedSchedules = await Schedule.deleteMany({
-        //     court: courtId,
-        // })
-        const deletedSchedule = await Schedule.findOneAndDelete({
+        const existingSchedule = await Schedule.findOne({
             court: courtId
         }).exec();
 
-        // Fetching all registered & pending cases
-        const cases = await RegisteredCase.find({
+        // Fetching new cases
+        let newCases = await RegisteredCase.find({
             courtId,
-            // caseStatus: 'pending',
-            caseStatus: { $in: ['pending', 'registered'] }
+            caseStatus: 'registered',
         }).exec();
-    
-        if (cases.length <= 0) {
-            console.log('No cases found for scheduling.');
-            return;
+
+        // Fetching pending cases
+        let pendingCases = await RegisteredCase.find({
+            courtId,
+            caseStatus: 'pending',
+        }).exec();
+
+        // Assigining score to new cases
+        newCases = await assignScore(newCases);
+
+        // Re-assigining score to existing cases
+        pendingCases = await reAssiginingScore(pendingCases);
+
+        // Finding first 20 cases (fixed)
+        let fixedCases = [];
+        if (existingSchedule) {
+            for (let i = 0; i < existingSchedule.cases.length && i < 20; i++) {
+                fixedCases.push(existingSchedule.cases[i]);
+            }
         }
 
-        await assignScore(cases);
-        await scheduleCases(courtId, cases);
+    
+        // Finding non fixed cases - (these are ready to re-schedule)
+        let notFixedCases = pendingCases.filter(pendingCase => {
+            // Check if there is no matching caseId in the fixedCases array
+            return !fixedCases.some(fixedCase => fixedCase.caseId === pendingCase._id);
+        });
+
+
+        // 1. Make a single list of nonFixedCases & newCases
+        // 2. Sort this list on the basis of score
+        // 3. Assign slots to these sorted cases.
+        // 4. From the schedule remove all the cases other than first 20
+        // 5. Save these sorted cases slots to Schedule.
+
+
+
+        
+        // // Fetching all registered & pending cases
+        // const cases = await RegisteredCase.find({
+        //     courtId,
+        //     // caseStatus: 'pending',
+        //     caseStatus: { $in: ['pending', 'registered'] }
+        // }).exec();
+
+        // if (cases.length <= 0) {
+        //     console.log('No cases found for scheduling.');
+        //     return;
+        // }
+
+        // await assignScore(cases);
+        // await scheduleCases(courtId, cases);
 
     } catch (error) {
         console.log(error);
@@ -106,25 +144,63 @@ const schedulingAlgo = async (courtId) => {
 
 
 
-// score
+// Calculate & assign score to new cases
 const assignScore = async (cases) => {
     try {
         for (const caseItem of cases) {
             const caseDate = caseItem.caseInfo.regDate;
             const currDate = new Date();
-            const prevScore = caseItem.currScore; 
-            // const prevScore = caseItem.prevScore; 
             const track = getTrack();
             const constFactor = getConstFactor();
             const statement = caseItem.caseInfo.caseDesc;
-    
-            const currScore = getTotalScore(caseDate, currDate, prevScore, track, constFactor, statement);
-    
+
+            // 1. dateScore
+            const dateScore = getDateScore(caseDate, currDate, constFactor);
+
+            // 2. trackScore
+            const trackScore = getTrackScore(track);
+
+            // 3. severityScore
+            const severityScore = getSeverityScore(statement);
+
+            const totalScore = dateScore+trackScore+severityScore;
+
+            caseItem.score = totalScore;
+
             const result = await RegisteredCase.findByIdAndUpdate(caseItem._id, {
-                prevScore: prevScore,
-                currScore: currScore,
-            })
+                score: totalScore,
+            }).exec();
         }
+
+        return cases;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+// Re-calculating score for existing cases
+const reAssiginingScore = async (cases) => {
+    try {
+        for (const caseItem of cases) {
+            const caseDate = caseItem.caseInfo.regDate;
+            const currDate = new Date();
+            const constFactor = getConstFactor();
+            // 1. dateScore
+            const dateScore = getDateScore(caseDate, currDate, constFactor);
+
+            // 2. prevScore
+            const prevScore = caseItem.score;
+
+            const totalScore = dateScore+prevScore;
+
+            caseItem.score = totalScore;
+
+            const result = await RegisteredCase.findByIdAndUpdate(caseItem._id, {
+                score: totalScore,
+            }).exec();
+        }
+
+        return cases;
     } catch (error) {
         console.log(error);
     }
@@ -209,10 +285,10 @@ const getTrack = () => {
 // time schedule
 const scheduleCases = async (courtId, cases) => {
     try {
-        
+
         // Sort cases by priority score (higher score means higher priority)
         cases.sort((a, b) => b.currScore - a.currScore);
-    
+
         // // Find the court's schedule or create a new one if not exists
         // let schedule = await Schedule.findOne({ court: courtId }).exec();
 
@@ -226,19 +302,19 @@ const scheduleCases = async (courtId, cases) => {
 
 
         let schedule = new Schedule({ court: courtId, cases: [] });
-        
-    
+
+
         // Iterate over the sorted cases and schedule them
         for (const caseItem of cases) {
             const dateAndTime = assignTimeSlots(schedule);
-    
+
             if (dateAndTime) {
                 schedule.cases.push({ caseId: caseItem._id, dateAndTime });
             } else {
                 console.log(`Could not schedule case ${caseItem._id}. No available slots.`);
             }
         }
-    
+
         // Update or create the schedule in the database
         const result = await schedule.save();
         console.log(`Schedule updated for court ${courtId}.`);
@@ -247,7 +323,7 @@ const scheduleCases = async (courtId, cases) => {
     } catch (error) {
         console.log(error);
     }
-    
+
 }
 
 const assignTimeSlots = (schedule) => {
@@ -285,7 +361,7 @@ const assignTimeSlots = (schedule) => {
 
     const lastCaseDateAndTimeObj = new Date(lastCase.dateAndTime);
     // Calculate the start time of the new case (after the last case)
-    
+
     // const nextStartTime = lastCase.dateAndTime.getTime() + caseDuration;
     const nextStartTime = lastCaseDateAndTimeObj.getTime() + caseDuration;
     const nextStartTimeDateObj = new Date(nextStartTime);
