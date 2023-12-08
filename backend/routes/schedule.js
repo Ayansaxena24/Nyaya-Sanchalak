@@ -6,10 +6,9 @@ const router = express.Router();
 const { verifyJWT, verifyRoles } = require('../middlewares/auth');
 
 // controllers
-const { getSchedule } = require('../controllers/scheduler');
+const { getSchedule, removeSchedule } = require('../controllers/scheduler');
 
 router.post('/schedule', verifyJWT, getSchedule);
-// router.post('/current-user', authCheck, currentUser);
-// router.post('/current-admin', authCheck, adminCheck, currentUser);
+router.delete('/schedule', verifyJWT, removeSchedule);
 
 module.exports = router;
