@@ -301,3 +301,5 @@ const assignTimeSlots = (schedule) => {
 
   return nextDayStartTime;
 };
+
+// Using map fucntion to get
