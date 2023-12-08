@@ -1,29 +1,3 @@
-<<<<<<< HEAD
-const RegisteredCase = require("../models/RegisteredCase");
-const Court = require("../models/Court");
-const Schedule = require("../models/Schedule");
-
-exports.getSchedule = async (req, res) => {
-  try {
-    const { courtId } = req.body;
-
-    await schedulingAlgo(courtId);
-
-    const schedule = await Schedule.findOne({
-      court: courtId,
-    })
-      .populate("case")
-      .populate("courtId")
-      .sort("dateAndTime")
-      .exec();
-
-    res.status(200).json(schedule);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json("Internal server error!");
-  }
-};
-=======
 const schedule = require('node-schedule');
 
 const RegisteredCase = require('../models/RegisteredCase')
@@ -62,7 +36,6 @@ exports.getSchedule = async (req, res) => {
     }
 
 }
->>>>>>> f69ab88dff91430e8b61a284af735c51546942ec
 
 exports.removeSchedule = async (req, res) => {
     try {
@@ -96,67 +69,6 @@ exports.updateSchedule = async (req, res) => {
 
 // Schedule cases of a particular court
 const schedulingAlgo = async (courtId) => {
-<<<<<<< HEAD
-  // TODO - Schedule cases of a particular court
-
-  try {
-    const cases = await RegisteredCase.find({
-      courtId,
-    }).exec();
-
-    if (cases.length <= 0) {
-      console.log("No cases found for scheduling.");
-      return;
-    }
-
-    assignScore(cases);
-    scheduleCases(courtId, cases);
-  } catch (error) {
-    console.log(error);
-  }
-
-  // input req
-
-  // 1. last date of hearing / rigistration date
-  // 2. last score (if heared)
-  // 3. current date
-  // 4. severity score
-  // 5. track
-  // 6. case _id
-  // 7. court _id
-  // 8. constFactor
-  // 9. case statement
-  // 10. Judge sorting score
-  // 11. Aging score (for removing starvation)
-};
-
-// --------------------> utility functions <---------------------------
-
-// score
-const assignScore = async (cases) => {
-  try {
-    for (const caseItem of cases) {
-      const caseDate = caseItem.caseInfo.regDate;
-      const currDate = new Date();
-      const prevScore = caseItem.currScore;
-      const track = getTrack();
-      const constFactor = getConstFactor();
-      const statement = caseItem.caseInfo.caseDesc;
-
-      const currScore = getTotalScore(
-        caseDate,
-        currDate,
-        prevScore,
-        track,
-        constFactor,
-        statement
-      );
-
-      const result = await RegisteredCase.findByIdAndUpdate(caseItem._id, {
-        prevScore: prevScore,
-        currScore: currScore,
-      });
-=======
 
     try {
 
@@ -291,12 +203,9 @@ const reAssiginingScore = async (cases) => {
         return cases;
     } catch (error) {
         console.log(error);
->>>>>>> f69ab88dff91430e8b61a284af735c51546942ec
     }
-  } catch (error) {
-    console.log(error);
   }
-};
+;
 
 const getTotalScore = (
   caseDate,
@@ -321,16 +230,9 @@ const getTotalScore = (
   // 5. agingScore
   // const agingScore = getAgingScore();
 
-<<<<<<< HEAD
-  // totalScore
-  const totalScore = scoreCaluclateByTime;
-  trackScore + severityScore + judgeScore;
-  // agingScore;
-=======
     // 5. agingScore
     // const agingScore = getAgingScore();
     const agingScore = 0;
->>>>>>> f69ab88dff91430e8b61a284af735c51546942ec
 
   // Prev score ko hatana padsakta hai verna high priority hamesha hi high pe rahega last score add up hoga isliye
 
@@ -396,31 +298,16 @@ const getTrackScore = (track) => {
 
 // TODO
 const getSeverityScore = (statement) => {
-<<<<<<< HEAD
-  // TODO - connect with python model to get severity score
-  return 0;
-};
-=======
     // TODO - connect with python model to get severity score
     return 5;
 }
->>>>>>> f69ab88dff91430e8b61a284af735c51546942ec
 
 
 // TODO
 const getJudgeScore = () => {
-<<<<<<< HEAD
-  // TODO - decide the score if judge will sort the cases
-
-  // Yaha pe ek factor database mai dalna padega ki if judge factor= then only return 999 verna return 0
-
-  return 999;
-};
-=======
     // TODO - decide the score if judge will sort the cases
     return 0;
 }
->>>>>>> f69ab88dff91430e8b61a284af735c51546942ec
 
 const getAgingScore = () => {
   return 5;
@@ -436,11 +323,6 @@ const getTrack = () => {
 
 // time schedule
 const scheduleCases = async (courtId, cases) => {
-<<<<<<< HEAD
-  try {
-    // Sort cases by priority score (higher score means higher priority)
-    cases.sort((a, b) => b.score - a.score);
-=======
     try {
 
         // Sort cases by priority score (higher score means higher priority)
@@ -448,16 +330,10 @@ const scheduleCases = async (courtId, cases) => {
 
         // // Find the court's schedule or create a new one if not exists
         // let schedule = await Schedule.findOne({ court: courtId }).exec();
->>>>>>> f69ab88dff91430e8b61a284af735c51546942ec
 
     // // Find the court's schedule or create a new one if not exists
     // let schedule = await Schedule.findOne({ court: courtId }).exec();
 
-<<<<<<< HEAD
-    // if (!schedule) {
-    //     schedule = new Schedule({ court: courtId, cases: [] });
-    // }
-=======
         // Find the court's schedule delete it.
         // let schedule = await Schedule.findOneAndDelete({ court: courtId }).exec();
 
@@ -481,7 +357,6 @@ const scheduleCases = async (courtId, cases) => {
         const result = await schedule.save();
         console.log(`Schedule updated for court ${courtId}.`);
         console.log('schedule -> ', result);
->>>>>>> f69ab88dff91430e8b61a284af735c51546942ec
 
     // Find the court's schedule delete it.
     let schedule = await Schedule.findOneAndDelete({ court: courtId }).exec();
@@ -500,31 +375,15 @@ const scheduleCases = async (courtId, cases) => {
       }
     }
 
-<<<<<<< HEAD
-    // Update or create the schedule in the database
-    const result = await schedule.save();
-    console.log(`Schedule updated for court ${courtId}.`);
-    console.log("schedule -> ", result);
-  } catch (error) {
-    console.log(error);
-  }
-};
-=======
 }
->>>>>>> f69ab88dff91430e8b61a284af735c51546942ec
 
 const assignTimeSlots = (schedule) => {
   // Get all the existing cases in the schedule
   const existingCases = schedule.cases;
 
-<<<<<<< HEAD
-  // Specify the duration needed for each case (in milliseconds)
-  const caseDuration = 1000 * 60 * 60 * 2; // Assuming each case takes 2 hours
-=======
     // Specify the duration needed for each case (in milliseconds)
     // const caseDuration = 1000 * 60 * 60 * 2; // Assuming each case takes 2 hours
     const caseDuration = 1000 * 60 * 60 * 2; // Assuming each case takes 1 hours
->>>>>>> f69ab88dff91430e8b61a284af735c51546942ec
 
   // Specify the start and end time for scheduling cases (11:00 AM - 4:00 PM)
   const startTimeRange = 11;
@@ -533,16 +392,6 @@ const assignTimeSlots = (schedule) => {
   // Sort the existing cases by dateAndTime
   existingCases.sort((a, b) => a.dateAndTime - b.dateAndTime);
 
-<<<<<<< HEAD
-  // Calculate the start time for scheduling three days before the current date
-  const today = new Date();
-  const startTime = new Date(
-    today.getFullYear(),
-    today.getMonth(),
-    today.getDate() - 3,
-    startTimeRange
-  );
-=======
     // Calculate the start time for scheduling three days before the current date
     const today = new Date();
     const startTime = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 3, startTimeRange, 0, 0);
@@ -551,7 +400,6 @@ const assignTimeSlots = (schedule) => {
     const localStartTime = startTime.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
     console.log(localStartTime + ", ");
     // console.log(startTime);
->>>>>>> f69ab88dff91430e8b61a284af735c51546942ec
 
   // Find the last scheduled case
   const lastCase =
@@ -567,7 +415,6 @@ const assignTimeSlots = (schedule) => {
   // const nextStartTime = lastCase.dateAndTime.getTime() + caseDuration;
   const nextStartTime = lastCaseDateAndTimeObj.getTime() + caseDuration;
 
-<<<<<<< HEAD
   // Check if the new case can be scheduled on the same day within the specified time range
   if (
     // startTime.getDate() === lastCase.dateAndTime.getDate() &&
@@ -579,40 +426,6 @@ const assignTimeSlots = (schedule) => {
     return new Date(nextStartTime);
   }
   // Hello World
-=======
-    const lastCaseDateAndTimeObj = new Date(lastCase.dateAndTime);
-    // Calculate the start time of the new case (after the last case)
-
-    // const nextStartTime = lastCase.dateAndTime.getTime() + caseDuration;
-    const nextStartTime = lastCaseDateAndTimeObj.getTime() + caseDuration;
-    const nextStartTimeDateObj = new Date(nextStartTime);
-
-    // Check if the new case can be scheduled on the same day within the specified time range
-    if (
-        // startTime.getDate() === lastCase.dateAndTime.getDate() &&
-
-        startTime.getDate() === lastCaseDateAndTimeObj.getDate() &&
-        // nextStartTime.getHours() >= startTimeRange &&
-        // nextStartTime.getHours() < endTimeRange
-
-        nextStartTimeDateObj.getHours() >= startTimeRange &&
-        nextStartTimeDateObj.getHours() < endTimeRange
-    ) {
-        // Return the start time as a Date object for the same day
-        return new Date(nextStartTime);
-    }
-
-    // If the new case needs to be scheduled on the next day, set the time to the start of the next day
-    const nextDayStartTime = new Date(
-        startTime.getFullYear(),
-        startTime.getMonth(),
-        startTime.getDate() + 1,
-        startTimeRange
-    );
-
-    return nextDayStartTime;
-}
->>>>>>> f69ab88dff91430e8b61a284af735c51546942ec
 
   // If the new case needs to be scheduled on the next day, set the time to the start of the next day
   const nextDayStartTime = new Date(
@@ -625,9 +438,6 @@ const assignTimeSlots = (schedule) => {
   return nextDayStartTime;
 };
 
-<<<<<<< HEAD
-// Using map fucntion to get
-=======
 
 const createAndUpdateSchedules = async () => {
     const allCourts = await Court.find({}).select('_id');
@@ -644,4 +454,3 @@ schedule.scheduleJob(interval, createAndUpdateSchedules);
 
 
 
->>>>>>> f69ab88dff91430e8b61a284af735c51546942ec
