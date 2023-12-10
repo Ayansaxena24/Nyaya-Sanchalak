@@ -14,7 +14,7 @@ const bcrypt = require('bcrypt');
 // };
 
 exports.handleRegister = async (req, res) => {
-
+    console.log(req.body);
     const { jobId, name, password, roles, court } = req.body;
     if (!jobId || !name || !password) return res.status(400).json({ 'message': 'JobID, name and password are required.' });
 

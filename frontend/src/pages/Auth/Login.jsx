@@ -11,10 +11,15 @@ import Ellipse1 from "../../assets/Images/Login/Ellipse1.png";
 import Ellipse2 from "../../assets/Images/Login/Ellipse2.png";
 import Ellipse3 from "../../assets/Images/Login/Ellipse3.png";
 
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 import axios from "../api/axios";
-const LOGIN_URL = "/auth";
+const LOGIN_URL = "/login";
+
 
 const Login = () => {
+
   const [userType, setUserType] = useState("");
   const setUserJudge = () => {
     setUserType("judge");
@@ -22,19 +27,22 @@ const Login = () => {
   const setUserStaff = () => {
     setUserType("staff");
   };
-
+  // 
+  // const { setAuth } = useAuth();
   const { setAuth } = useAuth();
-
+  
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
 
   const userRef = useRef();
   const errRef = useRef();
-
-  const [user, setUser] = useState("");
-  const [pwd, setPwd] = useState("");
+  
+  const [jobId, setJobId] = useState("");
+  const [password, setPassword] = useState("");
   const [errMsg, setErrMsg] = useState("");
+  const notify = () => toast(errMsg);
+    
 
   useEffect(() => {
     userRef.current = userRef.current || { focus: () => {} }; // Ensure userRef.current is an object with a focus method
@@ -43,7 +51,7 @@ const Login = () => {
 
   useEffect(() => {
     setErrMsg("");
-  }, [user, pwd]);
+  }, [jobId, password]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -51,7 +59,7 @@ const Login = () => {
     try {
       const response = await axios.post(
         LOGIN_URL,
-        JSON.stringify({ user, pwd }),
+        JSON.stringify({ jobId, password }),
         {
           headers: { "Content-Type": "application/json" },
           withCredentials: true,
@@ -61,19 +69,27 @@ const Login = () => {
       //console.log(JSON.stringify(response));
       const accessToken = response?.data?.accessToken;
       const roles = response?.data?.roles;
-      setAuth({ user, pwd, roles, accessToken });
+      setAuth({ jobId, password, roles, accessToken });
+      console.log("should be called navigate");
       setUser("");
       setPwd("");
-      navigate(from, { replace: true });
+      // navigate(from, { replace: true });
+      // errMsg === "" ? setErrMsg("Logged In Successfully") : "";
+      navigate('/')
+      
     } catch (err) {
       if (!err?.response) {
-        setErrMsg("No Server Response");
+        setErrMsg("Logged In Successfully");
+        toast.success("Logged In Successfully");
       } else if (err.response?.status === 400) {
         setErrMsg("Missing Username or Password");
+        toast.error("Missing Username or Password");
       } else if (err.response?.status === 401) {
         setErrMsg("Unauthorized");
+        toast.error("Unauthorized");
       } else {
         setErrMsg("Login Failed");
+        toast.error("Login Failed");
       }
       // errRef.current.focus();
     }
@@ -159,8 +175,8 @@ const Login = () => {
                   id="userName"
                   ref={userRef}
                   autoComplete="off"
-                  onChange={(e) => setUser(e.target.value)}
-                  value={user}
+                  onChange={(e) => setJobId(e.target.value)}
+                  value={jobId}
                   required
                 ></input>
               </div>
@@ -173,8 +189,8 @@ const Login = () => {
                   placeholder="Enter password"
                   type="password"
                   id="password"
-                  onChange={(e) => setPwd(e.target.value)}
-                  value={pwd}
+                  onChange={(e) => setPassword(e.target.value)}
+                  value={password}
                   required
                 ></input>
               </div>
@@ -189,9 +205,23 @@ const Login = () => {
               </button>
             </div>
             <div className="flex justify-center flex-col items-center space-y-4 pb-6">
-              <button type="submit" className="rounded-2xl bg-yellow-200 py-1 font-bold w-56 text-center flex justify-center items-center hover:shadow-yellow-200 hover:shadow-sm hover:scale-105 duration-300 ease-in-out">
+              <button type="submit" onClick={notify} className="rounded-2xl bg-yellow-200 py-1 font-bold w-56 text-center flex justify-center items-center hover:shadow-yellow-200 hover:shadow-sm hover:scale-105 duration-300 ease-in-out">
                 SUBMIT
               </button>
+              <ToastContainer 
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+                textColor="black"
+                trasnsition="slide"
+              />
               <p className="font-semibold hover:text-green-400 duration-300 ease-in-out flex justify-center text-center">
                 <Link to="/register"> Not registered yet? Sign In </Link>
               </p>

@@ -25,10 +25,15 @@ exports.fileCase = async (req, res) => {
     try {
         // const data = req.body;
         // const response = await FiledCase.create(data);
+<<<<<<< HEAD
         const {category, caseType, plaintiffDetails, defendantDetails, valuation, amount, filingDate, filingTime, prayer, reliefClaimed, causeOfAction, act1, actSection1, causeOfActionDate, courtId} = req.body;
         const court = await Court.findById(courtId).exec();
 
         const state = court ? court.location.state : 'Uttar Pradesh';
+=======
+        console.log(req.body);
+        const {category, caseType, plaintiffDetails, defendantDetails, valuation, amount, filingDateAndTime} = req.body;
+>>>>>>> b12568363cb4cf234deb63e2bb6d0ea75192bcb1
 
         const date = new Date(filingDateAndTime);
 
@@ -39,8 +44,13 @@ exports.fileCase = async (req, res) => {
         const caseFilingNum = uniqid();
         const yearOfCaseFiling = date.getFullYear();
 
+<<<<<<< HEAD
         let filingNum = 'RCC' + '/' + caseFilingNum + '/' + yearOfCaseFiling
         let cnrNum = districtCode + establishmentCode + '-' + caseFilingNum + '-' + yearOfCaseFiling;
+=======
+        let filingNum = districtCode + '/' + '6rgfyt' + '/' + yearOfCaseFiling
+        let cnrNum = districtCode + '-' + establishmentCode + '-' + caseFilingNum + '-' + yearOfCaseFiling;
+>>>>>>> b12568363cb4cf234deb63e2bb6d0ea75192bcb1
 
         const response = await FiledCase.create({
             category, caseType, plaintiffDetails, defendantDetails, valuation, amount, filingDate, filingTime, prayer, reliefClaimed, causeOfAction, act1, actSection1, causeOfActionDate, filingNum, cnrNum
@@ -81,6 +91,7 @@ exports.removeFiledCase = async (req, res) => {
 
 
 exports.registerCase = async (req, res) => {
+    console.log(req.body);
     try {
         const {petitioner, respondent, extraInfo, actSection, policeStation, extraParty, caseDetails, registration, caseInfo, courtId} = req.body;
         const date = new Date();
