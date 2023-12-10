@@ -206,6 +206,7 @@ const reAssiginingScore = async (cases) => {
     }
 }
 
+
 const getTotalScore = (caseDate, currDate, prevScore, track, constFactor, statement) => {
 
     // 1. dateScore
@@ -410,3 +411,4 @@ schedule.scheduleJob(interval, createAndUpdateSchedules);
 
 
 
+// Yaha se mai same level pe aagya hu 
