@@ -5,6 +5,8 @@ const Court = require('../models/Court')
 const Schedule = require('../models/Schedule')
 
 
+
+
 // const interval = '0 0 */3 * *'; // every 3 days
 // const interval = '0 */2 * * *';  // every 2 hrs
 // const interval = '*/1 * * * *'; // Schedule interval (every 1 minute);
@@ -17,6 +19,8 @@ const interval = '*/2 * * * * *'; // Schedule interval (every 2 seconds)
 exports.getSchedule = async (req, res) => {
 
     try {
+
+
         const { courtId } = req.body;
 
         // await schedulingAlgo(courtId);
@@ -68,7 +72,15 @@ exports.updateSchedule = async (req, res) => {
 
 
 // Schedule cases of a particular court
-const schedulingAlgo = async (courtId) => {
+const schedulingAlgo = async (courtId, type) => {
+
+    if (type === 'civil') {
+        scheduleCivilCases(courtId);
+    } else {
+        scheduleCriminalCases(courtId);
+    }
+
+
 
     try {
 
@@ -83,17 +95,27 @@ const schedulingAlgo = async (courtId) => {
             });
         }
 
-        // Fetching new cases
-        let newCases = await RegisteredCase.find({
+        // Fetching not heard cases
+        let notHeardCases = await RegisteredCase.find({
             courtId,
             caseStatus: 'not heard',
         }).exec();
 
-        // Fetching pending cases
+        // Fetching pending cases which has final argument
+        let finalArgementCases = await RegisteredCase.find({
+            courtId,
+            caseStatus: 'pending',
+            finalArgement: true,
+        }).exec();
+
+        // Fetching pending cases which has not final argument
         let pendingCases = await RegisteredCase.find({
             courtId,
             caseStatus: 'pending',
+            finalArgement: false,
         }).exec();
+
+
 
         // Finding first 20 cases (fixed)
         // let fixedCases = [];
@@ -106,16 +128,32 @@ const schedulingAlgo = async (courtId) => {
 
 
 
+<<<<<<< HEAD
+=======
+
+        // TODO - problem in not fixed cases
+
+        // Finding non fixed cases - (these are ready to re-schedule)
+        // let notFixedCases = pendingCases.filter(pendingCase => {
+        //     // Check if there is no matching caseId in the fixedCases array
+        //     return !fixedCases.some(fixedCase => fixedCase.caseId === pendingCase._id);
+        // });
+
+        // console.log('Not fixed cases -> ', notFixedCases);
+        // console.log('fixed cases -> ', fixedCases);
+
+
+>>>>>>> 3981c5d8a0824bcfe893138dc71f870fbfd0626b
 
 
 
-        
-        
 
-        // Assigining score to new cases
-        newCases = await assignScore(newCases);
 
-        // Re-assigining score to not fixed cases
+
+        // Assigining score to not heard cases
+        notHeardCases = await assignScore(notHeardCases);
+
+        // Re-assigining score to pending cases
         pendingCases = await reAssiginingScore(pendingCases);
 
         // Track wise case list
@@ -124,11 +162,20 @@ const schedulingAlgo = async (courtId) => {
         const track3cases = pendingCases.filter(caseObj => caseObj.track === 3);
 
 
-        // 1. Make a single list of nonFixedCases & newCases
-        const casesToBeScheduled = [...pendingCases, ...newCases];
+
+
+
+
+
+
+
+
+
+        // 1. Make a single list of nonFixedCases & notHeardCases
+        // const casesToBeScheduled = [...pendingCases, ...notHeardCases];
 
         // 2. Sort this list on the basis of score
-        casesToBeScheduled.sort((a, b) => b.score - a.score);
+        // casesToBeScheduled.sort((a, b) => b.score - a.score);
 
         // // 3. From the schedule remove all the cases other than first 20
         // existingSchedule = await Schedule.findByIdAndUpdate(existingSchedule._id, {
@@ -136,37 +183,37 @@ const schedulingAlgo = async (courtId) => {
         // });
 
         // 3. Remove previous schedule
-        const removedExistingSchedule = await Schedule.findOneAndUpdate({court: courtId}, {
-            cases: [],
-        }).exec();
+        // const removedExistingSchedule = await Schedule.findOneAndUpdate({court: courtId}, {
+        //     cases: [],
+        // }).exec();
 
-        console.log("removed ->> ", removedExistingSchedule);
+        // console.log("removed ->> ", removedExistingSchedule);
 
         // 4. Assign slots to these sorted cases (casesToBeScheduled).
-        for (const caseItem of casesToBeScheduled) {
-            const dateAndTime = assignTimeSlots(existingSchedule);
+        // for (const caseItem of casesToBeScheduled) {
+        //     const dateAndTime = assignTimeSlots(existingSchedule);
 
-            if (dateAndTime) {
-                existingSchedule.cases.push({ caseId: caseItem._id, dateAndTime });
-            } else {
-                console.log(`Could not schedule case ${caseItem._id}. No available slots.`);
-            }
-        }
+        //     if (dateAndTime) {
+        //         existingSchedule.cases.push({ caseId: caseItem._id, dateAndTime });
+        //     } else {
+        //         console.log(`Could not schedule case ${caseItem._id}. No available slots.`);
+        //     }
+        // }
 
 
         // 5. Save these sorted cases slots to Schedule.
-            // Update or create the schedule in the database
+        // Update or create the schedule in the database
         // const result = await Schedule.findByIdAndUpdate(existingSchedule._id, {
         //     cases: existingSchedule.cases
         // })
-        console.log(`Schedule updated for court ${courtId}.`);
-        console.log('schedule -> ', existingSchedule);
+        // console.log(`Schedule updated for court ${courtId}.`);
+        // console.log('schedule -> ', existingSchedule);
 
 
 
 
 
-        
+
         // // Fetching all registered & pending cases
         // const cases = await RegisteredCase.find({
         //     courtId,
@@ -186,6 +233,90 @@ const schedulingAlgo = async (courtId) => {
         console.log(error);
     }
 
+}
+
+const scheduleCivilCases = async (courtId) => {
+    /*
+        Preference Order
+        * 0. Track
+        * 1. Date of registration
+        * 2. Final argument
+        * 3. Parties are bringing Evidences
+        * 4. Relief
+        * 5. Temp Injunction
+        * 6. Valuation
+        * 7. Amendment / Inspection (simple or urgency)
+        * 8. Family dispute - partition, adoption, succession
+        * 9. Number of Hearing
+    */
+
+
+    // const notHeardCases = await RegisteredCase.find({
+    //     courtId: courtId, 
+    //     caseStatus: 'not heard',
+    // })
+
+    // const pendingCases = await RegisteredCase.find({
+    //     courtId: courtId, 
+    //     caseStatus: 'pending'
+    // })
+
+    const allCases = await RegisteredCase.find({
+        courtId
+    })
+
+
+    // Track wise case list
+    const allTrack1cases = allCases.filter(caseObj => caseObj.track === 1);
+    const allTrack2cases = allCases.filter(caseObj => caseObj.track === 2);
+    const allTrack3cases = allCases.filter(caseObj => caseObj.track === 3);
+
+    // Not heard cases
+    const notHeardCasesTrack1 = allTrack1cases.filter(caseObj => caseObj.caseStatus === 'not heard');
+    const notHeardCasesTrack2 = allTrack2cases.filter(caseObj => caseObj.caseStatus === 'not heard');
+    const notHeardCasesTrack3 = allTrack3cases.filter(caseObj => caseObj.caseStatus === 'not heard');
+
+    // Pending Case
+    const pendingCaseTrack1 = allTrack1cases.filter(caseObj => caseObj.caseStatus === 'pending');
+    const pendingCaseTrack2 = allTrack2cases.filter(caseObj => caseObj.caseStatus === 'pending');
+    const pendingCaseTrack3 = allTrack3cases.filter(caseObj => caseObj.caseStatus === 'pending');
+
+
+
+}
+
+const scheduleCriminalCases = async (courtId) => {
+
+
+
+    const pendingCriminalCases = await RegisteredCase.find({
+        courtId: courtId,
+        caseStaus: 'pending'
+    })
+
+    const newCriminalCases = await RegisteredCase.find({
+        courtId: courtId,
+        caseStaus: 'not heard'
+    })
+
+
+
+
+
+
+
+    /*
+        Preference Order
+        * 0. IPC Act
+        * 1. Date of registration
+        * 2. Severity Analysis Score
+        * 3.Number of hearing
+        * 4. Evidence (Value score ->kuch Particular value assign krna hai isko ?)
+        * 5. IsFinal Hearing
+        * 
+
+        * 
+    */
 }
 
 // --------------------> utility functions <---------------------------
@@ -211,7 +342,7 @@ const assignScore = async (cases) => {
             // 3. severityScore
             const severityScore = getSeverityScore(statement);
 
-            const totalScore = 1*dateScore+3*trackScore+2*severityScore;
+            const totalScore = 1 * dateScore + 3 * trackScore + 2 * severityScore;
 
             caseItem.score = totalScore;
 
@@ -226,6 +357,109 @@ const assignScore = async (cases) => {
         console.log(error);
     }
 }
+
+
+
+const assignScoreCivil = (case) => {
+    /*
+        Preference Order
+        * 0. Track
+        * 1. Date of registration
+        * 2. Final argument
+        * 3. Parties are bringing Evidences
+        * 4. Relief
+        * 5. Temp Injunction
+        * 6. Valuation
+        * 7. Amendment / Inspection (simple or urgency)
+        * 8. Family dispute - partition, adoption, succession
+        * 9. Number of Hearing
+    */
+
+    // 1. Track
+    const trackScore = getTrackScore(case.track);
+
+    // 2. Date difference
+    const dateScore = getDateScore(case.caseInfo.regDate, 2);
+
+    // 3. Final argument
+    const finalArgumentScore = getFinalArgumentScore();
+
+    // 4. Evidences 
+    const evidencesScore = getEvidenceScore();
+
+    // 5. Injuction
+    // (Score could be permanent,temporary or none  - >assignn krdenege inki kuch values)
+    const injuctionSore = getInJuctionScore();
+
+    // 6.Valuation of function  (3 cror,100 crore etc)
+    const valuation=getValuation();
+
+    // 7. Amendemant / Inspection
+    const amendemant=getAmendemantScore();
+
+    // 8. Number of Hearing
+    const scoreHearingCount=getHearingCount();
+
+    // 9.Family Dispute
+    const disputeScore=getFamilyDisputeScore();
+    
+
+
+
+}
+
+
+
+const getEvidenceScore = () => {
+    return 0;
+}
+
+const getInJuctionScore = () => {
+    return 1;
+}
+
+const getValuation=()=>{
+    // const const ka input dekhna padega
+    var cost;
+    return cost*1e-9;
+    
+}
+
+const getAmendemantScore=()=>{
+    // Simple hoga to one kardenge return verna 10
+    if('amedmant'==='simple') return 1;
+    return 10;
+}
+
+
+
+const getHearingCount=(cases)=>
+{
+    return cases.caseHearing.caseDescription.facts.length;
+}
+
+const getFamilyDisputeScore=()=>{
+    // This will depend upon partiton adoption and succession. The values Are yet to be determined for the same
+
+    return 1;
+
+}
+
+
+
+const assignScoreCriminal = () => {
+
+}
+
+
+
+
+
+
+
+
+
+
 
 // Re-calculating score for existing cases
 const reAssiginingScore = async (cases) => {
@@ -245,7 +479,7 @@ const reAssiginingScore = async (cases) => {
 
             // 4. 
 
-            const totalScore = dateScore+prevScore+caseHearingScore;
+            const totalScore = dateScore + prevScore + caseHearingScore;
 
             caseItem.score = totalScore;
 
@@ -285,9 +519,9 @@ const getTotalScore = (caseDate, currDate, prevScore, track, constFactor, statem
     return totalScore;
 }
 
-const getDateScore = (caseDate, currDate, constFactor) => {
+const getDateScore = (caseDate, constFactor) => {
     const date1 = new Date(caseDate);
-    const date2 = new Date(currDate);
+    const date2 = new Date();
     const differenceInMs = Math.abs(date2 - date1);
     const differenceInDays = Math.round(differenceInMs / (1000 * 60 * 60 * 24));
 
@@ -308,6 +542,10 @@ const getTrackScore = (track) => {
         default:
             return 0;
     }
+}
+
+const getFinalArgumentScore = () => {
+
 }
 
 
@@ -483,9 +721,25 @@ const createAndUpdateSchedules = async () => {
 
 }
 
+
+
+
+
+
 // Schedule the function to run at the specified interval
 schedule.scheduleJob(interval, createAndUpdateSchedules);
 
 
 
+<<<<<<< HEAD
 // Yaha se mai same level pe aagya hu 
+=======
+
+
+
+
+
+
+
+
+>>>>>>> 3981c5d8a0824bcfe893138dc71f870fbfd0626b
