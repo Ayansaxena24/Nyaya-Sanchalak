@@ -106,19 +106,6 @@ const schedulingAlgo = async (courtId) => {
 
 
 
-    
-        // TODO - problem in not fixed cases
-        
-        // Finding non fixed cases - (these are ready to re-schedule)
-        // let notFixedCases = pendingCases.filter(pendingCase => {
-        //     // Check if there is no matching caseId in the fixedCases array
-        //     return !fixedCases.some(fixedCase => fixedCase.caseId === pendingCase._id);
-        // });
-
-        // console.log('Not fixed cases -> ', notFixedCases);
-        // console.log('fixed cases -> ', fixedCases);
-
-
 
 
 
@@ -394,6 +381,12 @@ const scheduleCases = async (courtId, cases) => {
 
 }
 
+
+
+
+
+
+
 const assignTimeSlots = (schedule) => {
     // Get all the existing cases in the schedule
     const existingCases = schedule.cases;
@@ -459,6 +452,23 @@ const assignTimeSlots = (schedule) => {
 
     return nextDayStartTime;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

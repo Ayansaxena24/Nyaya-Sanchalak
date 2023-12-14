@@ -26,6 +26,11 @@ const scheduleSchema = new mongoose.Schema({
         ref: 'Court',
         required: [true, "court _id is required!"],
         unique: [true, "court_id should be unique!"]
+    },
+    isFinalHearing:{
+        type:Boolean,
+        default:false,
+
     }
 }, {timestamps: true});
 
