@@ -84,16 +84,16 @@ exports.registerCase = async (req, res) => {
     try {
         const {petitioner, respondent, extraInfo, actSection, policeStation, extraParty, caseDetails, registration, caseInfo, courtId} = req.body;
         const date = new Date();
-        const caseHistory = [
-            {
-                status: 'registered',
-                date: date,
-                court: courtId,
-            }
-        ]
+        // const caseHistory = [
+        //     {
+        //         status: 'registered',
+        //         date: date,
+        //         court: courtId,
+        //     }
+        // ]
         const response = await RegisteredCase.create({
             petitioner, respondent, extraInfo, actSection, policeStation, extraParty, caseDetails, registration, caseInfo, courtId,
-            caseHistory
+            // caseHistory
         });
         res.status(200).json(response);
     } catch (error) {
