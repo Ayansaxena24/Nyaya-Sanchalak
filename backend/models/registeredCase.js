@@ -302,6 +302,7 @@ const registeredCaseSchema = new mongoose.Schema({
         default: 'not heard',
         enum: ['not heard', 'pending', 'closed'],
     },
+
     caseHearing: [
         {
             status: String,
@@ -324,22 +325,18 @@ const registeredCaseSchema = new mongoose.Schema({
         type: ObjectId,
         ref: 'Court'
     },
-    track: {
-        type: Number,
-        required: [true, "Track is required!"],
-    },
-
-    // prevScore: {
-    //     type: Number,
-    //     default: 0,
-    // },
-    // currScore: {
-    //     type: Number,
-    //     default: 0,
-    // }
     score: {
         type: Number,
         default: 0,
+    },
+    
+    track: {
+        type: Number,
+        required: [true, "Track is required!"],
+    }, 
+    finalArgement: {
+        type: Boolean,
+        default: false,
     }
 }, {timestamps: true});
 

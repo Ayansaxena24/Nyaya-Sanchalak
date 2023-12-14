@@ -1,159 +1,3 @@
-// States	GST State Code	Alpha Code
-
-// export const states = [
-//     {
-//         state: 'Andhra Pradesh',
-//         code: 'AD',
-//     },
-//     {
-//         state: 'Arunachal Pradesh',
-//         code: 'AR',
-//     },
-//     {
-//         state: 'Assam',
-//         code: 'AS',
-//     },
-//     {
-//         state: 'Bihar',
-//         code: 'BR',
-//     },
-//     {
-//         state: 'Chattisgarh',
-//         code: 'CG',
-//     },
-//     {
-//         state: 'Delhi',
-//         code: 'DL',
-//     },
-//     {
-//         state: 'Goa',
-//         code: 'GA',
-//     },
-//     {
-//         state: 'Gujarat',
-//         code: 'GJ',
-//     },
-//     {
-//         state: 'Haryana',
-//         code: 'HR',
-//     },
-//     {
-//         state: 'Himachal Pradesh',
-//         code: 'HP',
-//     },
-//     {
-//         state: 'Jammu and Kashmir',
-//         code: 'JK',
-//     },
-//     {
-//         state: 'Jharkhand',
-//         code: 'JH',
-//     },
-//     {
-//         state: 'Karnataka',
-//         code: 'KA',
-//     },
-//     {
-//         state: 'Kerela',
-//         code: 'KL',
-//     },
-//     {
-//         state: 'Lakshadweep',
-//         code: 'LD',
-//     },
-//     {
-//         state: 'Madhya Pradesh',
-//         code: 'MP',
-//     },
-//     {
-//         state: 'Maharashtra',
-//         code: 'MH',
-//     },
-//     {
-//         state: 'Manipur',
-//         code: 'MN',
-//     },
-//     {
-//         state: 'Meghalaya',
-//         code: 'ML',
-//     },
-//     {
-//         state: 'Mizoram',
-//         code: 'MZ',
-//     },
-//     {
-//         state: 'Nagaland',
-//         code: 'NL',
-//     },
-//     {
-//         state: 'Odisha',
-//         code: 'OR',
-//     },
-//     {
-//         state: 'Pondicherry',
-//         code: 'PY',
-//     },
-//     {
-//         state: 'Punjab',
-//         code: 'PB',
-//     },
-//     {
-//         state: 'Rajasthan',
-//         code: 'RJ',
-//     },
-//     {
-//         state: 'Sikkim',
-//         code: 'SK',
-//     },
-//     {
-//         state: 'Tamil Nadu',
-//         code: 'TN',
-//     },
-//     {
-//         state: 'Telangana',
-//         code: 'TS',
-//     },
-//     {
-//         state: 'Tripura',
-//         code: 'TR',
-//     },
-//     {
-//         state: 'Uttar Pradesh',
-//         code: 'UP',
-//     },
-//     {
-//         state: 'Uttarakhand',
-//         code: 'UA',
-//     },
-//     {
-//         state: 'West Bengal',
-//         code: 'WB',
-//     },
-
-
-
-//     {
-//         state: 'Andaman and Nicobar Islands',
-//         code: 'AN',
-//     },
-//     {
-//         state: 'Chandigarh',
-//         code: 'CH',
-//     },
-//     {
-//         state: 'Dadra & Nagar Haveli and Daman & Diu',
-//         code: 'DNHDD'
-//     },
-//     {
-//         state: 'Ladakh',
-//         code: 'LA',
-//     },
-//     {
-//         state: 'Other Territory',
-//         code: 'OT'
-//     }
-// ]
-
 const stateMap = new Map([
     ['Andhra Pradesh', 'AD'],
     ['Arunachal Pradesh', 'AR'],
@@ -194,4 +38,31 @@ const stateMap = new Map([
     ['Other Territory', 'OT'],
 ])
 
-module.exports = {stateMap}
+//Trial Purpose Only
+const ipcSections = new Map([
+    ["Section 302",100],
+    ["Section 304",95],
+    ["Section 420",50],
+    ["Section 489A",80],
+    ["Section 34",40],
+    ["Section 354",35],
+    ["Section 509",40],
+    ["Section 138",20],
+    ["Section 120B",50],
+    ["Section 307",80],
+    ["Section 376",70],
+    ["Section 468",60],
+    ["Section 471",60],
+    ["Section 479",50],
+    ["Section 506",20],
+    ["Section 500",20],
+    ["Section 376A",85],
+    ["Section 323",10],
+    ["Section 377",50],
+    ["Section 427",30],
+    ["Section 394",35],
+    ["Section 506B",20],
+    // ["Section 323",10],
+])
+
+module.exports = {stateMap,ipcSections}
