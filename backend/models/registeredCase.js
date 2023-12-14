@@ -299,10 +299,10 @@ const registeredCaseSchema = new mongoose.Schema({
 
     caseStatus: {
         type: String,
-        default: 'registered',
-        enum: ['registered', 'pending', 'closed'],
+        default: 'not heard',
+        enum: ['not heard', 'pending', 'closed'],
     },
-    caseHistory: [
+    caseHearing: [
         {
             status: String,
             date: Date,
@@ -311,12 +311,22 @@ const registeredCaseSchema = new mongoose.Schema({
                 ref: 'Court',
             },
             score: Number,
+
+            caseDescription: {
+                facts: [],
+                evidence: [],
+                acts: [],
+            }
         }
     ],
 
     courtId: {
         type: ObjectId,
         ref: 'Court'
+    },
+    track: {
+        type: Number,
+        required: [true, "Track is required!"],
     },
 
     // prevScore: {
