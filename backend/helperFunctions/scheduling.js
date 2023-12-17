@@ -1,8 +1,13 @@
+const RegisteredCase = require("../models/RegisteredCase");
+
 const constFactor = 2;
+const finalArgementConstFactor = 10;
+
+const {trackMap, ipcSectionMap} = require('../constants/index');
 
 // Civil case functions
 
-const assignScoreCivil = (caseItem) => {
+const assignScoreCivil = async (caseItem) => {
     /*
 
         Preference Order
@@ -18,36 +23,44 @@ const assignScoreCivil = (caseItem) => {
         * 9. Number of Hearing
     */
 
-    // 1. Track ->Done
+    // 1. Track
     const trackScore = getTrackScore(caseItem.track);
 
-    // 2. Date difference ->Done
+    // 2. Date difference
     const dateScore = getDateScore(caseItem.caseInfo.regDate, 2);
 
-    // 3. Final argument >
+    // 3. Final argument
     const finalArgumentScore = getFinalArgumentScore();
 
-    // 4. Evidences 
-    const evidencesScore = getEvidenceScore();
+    // 3. Evidences - done
+    const evidencesScore = getEvidenceScore(caseItem);
+
+    // 4. Relief
+    // const reliefScore = getReliefScore();
 
     // 5. Injuction
     // (Score could be permanent,temporary or none  - >assignn krdenege inki kuch values)
-    const injuctionSore = getInJuctionScore();
+    // const injuctionSore = getInjuctionScore();
 
     // 6.Valuation of function  (3 cror,100 crore etc)
-    // const valuation=getValuation();
+    const valuation=getValuation();
 
     // 7. Amendemant / Inspection
-    const amendemant=getAmendemantScore();
+    // const amendemant = getAmendemantScore();
 
-    // 8. Number of Hearing ->Done
+    // 8. Number of Hearing
     const scoreHearingCount=getHearingCount();
 
     // 9.Family Dispute
-    const disputeScore=getFamilyDisputeScore();
+    // const disputeScore = getFamilyDisputeScore();
     
 
+    // Total score
+    const totalScore = trackScore + dateScore + finalArgumentScore + evidencesScore + reliefScore + injuctionSore + valuation + amendemant + hearingCountScore + disputeScore; 
 
+    const result = await RegisteredCase.findByIdAndUpdate(caseItem._id, {
+        score: totalScore,
+    }).exec();
 
 }
 const getTrackScore = (track) => {
@@ -104,7 +117,7 @@ const getFamilyDisputeScore=(caseItem)=>{
 
 // TODO ------------------------------------------------
 
-const assignScoreCriminal = async(caseItem) => {
+const assignScoreCriminal = () => {
 
 }
 
@@ -124,7 +137,7 @@ const getSeverityScore = () => {
 
 // Common functions
 
-const getDateScore = (caseDate, constFactor) => {
+const getDateScore = (caseDate) => {
     const date1 = new Date(caseDate);
     const date2 = new Date();
     const differenceInMs = Math.abs(date2 - date1);
@@ -136,19 +149,50 @@ const getDateScore = (caseDate, constFactor) => {
     return dateScore;
 }
 
-
-const getHearingScore = (caseItem) => {
+const getHearingCountScore = (caseItem) => {
     return caseItem.caseHearing.length;
 }
 
 // TODO -------------------------------------------
 
-const getFinalArgumentScore = () => {
-    return 0;
+const getFinalArgumentScore = (caseItem) => {
+    if (caseItem.finalArgument === true) {
+        return 20;
+    } else {
+        return 0;
+    }
 }
 
 const getEvidenceScore = () => {
-    
     return 0;
 }
 
+
+
+
+
+/*
+    CIVIL CASE
+        Preference Order
+        * 0. Track
+        * 1. Date of registration
+        * 2. Final argument
+        * 3. Parties are bringing Evidences
+        * 4. Relief
+        * 5. Temp Injunction
+        * 6. Valuation
+        * 7. Amendment / Inspection (simple or urgency)
+        * 8. Family dispute - partition, adoption, succession
+        * 9. Number of Hearing
+    */
+
+/*
+    CRIMINAL CASE
+        Preference Order
+        * 0. IPC Act
+        * 1. Date of registration
+        * 2. Severity Analysis Score
+        * 3.Number of hearing
+        * 4. Evidence (Value score ->kuch Particular value assign krna hai isko ?)
+        * 5. IsFinal Hearing
+    */

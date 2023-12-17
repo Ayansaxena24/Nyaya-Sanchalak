@@ -233,20 +233,6 @@ const schedulingAlgo = async (courtId, type) => {
 }
 
 const scheduleCivilCases = async (courtId) => {
-    /*
-        Preference Order
-        * 0. Track
-        * 1. Date of registration
-        * 2. Final argument
-        * 3. Parties are bringing Evidences
-        * 4. Relief
-        * 5. Temp Injunction
-        * 6. Valuation
-        * 7. Amendment / Inspection (simple or urgency)
-        * 8. Family dispute - partition, adoption, succession
-        * 9. Number of Hearing
-    */
-
 
     // const notHeardCases = await RegisteredCase.find({
     //     courtId: courtId, 
@@ -284,8 +270,6 @@ const scheduleCivilCases = async (courtId) => {
 
 const scheduleCriminalCases = async (courtId) => {
 
-
-
     const pendingCriminalCases = await RegisteredCase.find({
         courtId: courtId,
         caseStaus: 'pending'
@@ -297,165 +281,7 @@ const scheduleCriminalCases = async (courtId) => {
     })
 
 
-
-
-
-
-
-    /*
-        Preference Order
-        * 0. IPC Act
-        * 1. Date of registration
-        * 2. Severity Analysis Score
-        * 3.Number of hearing
-        * 4. Evidence (Value score ->kuch Particular value assign krna hai isko ?)
-        * 5. IsFinal Hearing
-        * 
-
-        * 
-    */
 }
-
-// --------------------> utility functions <---------------------------
-
-
-
-// Calculate & assign score to new cases
-const assignScore = async (cases) => {
-    try {
-        for (const caseItem of cases) {
-            const caseDate = caseItem.caseInfo.regDate;
-            const currDate = new Date();
-            const track = getTrack();
-            const constFactor = getConstFactor();
-            const statement = caseItem.caseInfo.caseDesc;
-
-            // 1. dateScore
-            const dateScore = getDateScore(caseDate, currDate, constFactor);
-
-            // 2. trackScore
-            const trackScore = getTrackScore(track);
-
-            // 3. severityScore
-            const severityScore = getSeverityScore(statement);
-
-            const totalScore = 1 * dateScore + 3 * trackScore + 2 * severityScore;
-
-            caseItem.score = totalScore;
-
-            const result = await RegisteredCase.findByIdAndUpdate(caseItem._id, {
-                score: totalScore,
-                // caseStatus: 'pending'
-            }).exec();
-        }
-
-        return cases;
-    } catch (error) {
-        console.log(error);
-    }
-}
-
-
-
-const assignScoreCivil = (case) => {
-    /*
-        Preference Order
-        * 0. Track
-        * 1. Date of registration
-        * 2. Final argument
-        * 3. Parties are bringing Evidences
-        * 4. Relief
-        * 5. Temp Injunction
-        * 6. Valuation
-        * 7. Amendment / Inspection (simple or urgency)
-        * 8. Family dispute - partition, adoption, succession
-        * 9. Number of Hearing
-    */
-
-    // 1. Track
-    const trackScore = getTrackScore(case.track);
-
-    // 2. Date difference
-    const dateScore = getDateScore(case.caseInfo.regDate, 2);
-
-    // 3. Final argument
-    const finalArgumentScore = getFinalArgumentScore();
-
-    // 4. Evidences 
-    const evidencesScore = getEvidenceScore();
-
-    // 5. Injuction
-    // (Score could be permanent,temporary or none  - >assignn krdenege inki kuch values)
-    const injuctionSore = getInJuctionScore();
-
-    // 6.Valuation of function  (3 cror,100 crore etc)
-    const valuation=getValuation();
-
-    // 7. Amendemant / Inspection
-    const amendemant=getAmendemantScore();
-
-    // 8. Number of Hearing
-    const scoreHearingCount=getHearingCount();
-
-    // 9.Family Dispute
-    const disputeScore=getFamilyDisputeScore();
-    
-
-
-
-}
-
-
-
-const getEvidenceScore = () => {
-    return 0;
-}
-
-const getInJuctionScore = () => {
-    return 1;
-}
-
-const getValuation=()=>{
-    // const const ka input dekhna padega
-    var cost;
-    return cost*1e-9;
-    
-}
-
-const getAmendemantScore=()=>{
-    // Simple hoga to one kardenge return verna 10
-    if('amedmant'==='simple') return 1;
-    return 10;
-}
-
-
-
-const getHearingCount=(cases)=>
-{
-    return cases.caseHearing.caseDescription.facts.length;
-}
-
-const getFamilyDisputeScore=()=>{
-    // This will depend upon partiton adoption and succession. The values Are yet to be determined for the same
-
-    return 1;
-
-}
-
-
-
-const assignScoreCriminal = () => {
-
-}
-
-
-
-
-
-
-
-
-
 
 
 // Re-calculating score for existing cases
@@ -515,62 +341,6 @@ const getTotalScore = (caseDate, currDate, prevScore, track, constFactor, statem
 
     return totalScore;
 }
-
-const getDateScore = (caseDate, constFactor) => {
-    const date1 = new Date(caseDate);
-    const date2 = new Date();
-    const differenceInMs = Math.abs(date2 - date1);
-    const differenceInDays = Math.round(differenceInMs / (1000 * 60 * 60 * 24));
-
-    // dateScore
-    const dateScore = differenceInDays * constFactor;
-
-    return dateScore;
-}
-
-const getTrackScore = (track) => {
-    switch (track) {
-        case 1:
-            return 1;
-        case 2:
-            return 3;
-        case 3:
-            return 5;
-        default:
-            return 0;
-    }
-}
-
-const getFinalArgumentScore = () => {
-
-}
-
-
-// TODO
-const getSeverityScore = (statement) => {
-    // TODO - connect with python model to get severity score
-    return 5;
-}
-
-
-// TODO
-const getJudgeScore = () => {
-    // TODO - decide the score if judge will sort the cases
-    return 0;
-}
-
-const getAgingScore = () => {
-    return 5;
-}
-
-const getConstFactor = () => {
-    return 2;
-}
-
-const getTrack = () => {
-    return 1;
-}
-
 
 // time schedule
 const scheduleCases = async (courtId, cases) => {
@@ -691,23 +461,6 @@ const assignTimeSlots = (schedule) => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 const createAndUpdateSchedules = async () => {
     const allCourts = await Court.find({}).select('_id');
 
@@ -717,11 +470,6 @@ const createAndUpdateSchedules = async () => {
 
 
 }
-
-
-
-
-
 
 // Schedule the function to run at the specified interval
 schedule.scheduleJob(interval, createAndUpdateSchedules);
