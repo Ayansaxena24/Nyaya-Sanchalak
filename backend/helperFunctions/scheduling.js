@@ -1,13 +1,13 @@
 const RegisteredCase = require("../models/RegisteredCase");
 
 const constFactor = 2;
-const finalArgementConstFactor = 10;
+// const finalArgementConstFactor = 10;
 
-const {trackMap, ipcSectionMap} = require('../constants/index');
+const { trackMap, ipcSectionMap } = require('../constants/index');
 
 // Civil case functions
 
-const assignScoreCivil = async (caseItem) => {
+exports.assignScoreCivil = async (caseItem) => {
     /*
         Preference Order
         * 0. Track
@@ -53,14 +53,20 @@ const assignScoreCivil = async (caseItem) => {
 
     // 9.Family Dispute
     // const disputeScore = getFamilyDisputeScore();
-    
+
+    // 10. Anupam's score
+    const anupamScore = getAnupamScore(caseItem);
+
 
     // Total score
-    const totalScore = trackScore + dateScore + finalArgumentScore + evidencesScore + reliefScore + injuctionSore + valuation + amendemant + hearingCountScore + disputeScore; 
+    const totalScore = trackScore + dateScore + finalArgumentScore + evidencesScore + hearingCountScore + anupamScore;
+    /* reliefScore + injuctionSore +  valuation + amendemant + disputeScore + */
 
     const result = await RegisteredCase.findByIdAndUpdate(caseItem._id, {
         score: totalScore,
-    }).exec();
+    }, {new: true}).exec();
+
+    return result;
 
 }
 
@@ -81,31 +87,35 @@ const getTrackScore = (track) => {
 
 // TODO --------------------------------------
 
-const getReliefScore = () => {
-    return 0;
-}
+// const getReliefScore = () => {
+//     return 0;
+// }
 
-const getInjuctionScore = () => {
-    return 0;
-}
+// const getInjuctionScore = () => {
+//     return 0;
+// }
 
-const getValuationScore = ()=>{
-    // const const ka input dekhna padega
-    // var cost;
-    // return cost*1e-9;
-    return 0;
-}
+// const getValuationScore = ()=>{
+//     // const const ka input dekhna padega
+//     // var cost;
+//     // return cost*1e-9;
+//     return 0;
+// }
 
-const getAmendemantScore = () => {
-    // Simple hoga to one kardenge return verna 10
-    // if('amedmant'==='simple') return 1;
-    // return 10;
-    return 0;
-}
+// const getAmendemantScore = () => {
+//     // Simple hoga to one kardenge return verna 10
+//     // if('amedmant'==='simple') return 1;
+//     // return 10;
+//     return 0;
+// }
 
-const getFamilyDisputeScore=()=>{
-    // This will depend upon partiton adoption and succession. The values Are yet to be determined for the same
-    // return 1;
+// const getFamilyDisputeScore=()=>{
+//     // This will depend upon partiton adoption and succession. The values Are yet to be determined for the same
+//     // return 1;
+//     return 0;
+// }
+
+const getAnupamScore = () => {
     return 0;
 }
 
@@ -117,7 +127,7 @@ const getFamilyDisputeScore=()=>{
 
 // TODO ------------------------------------------------
 
-const assignScoreCriminal = async (caseItem) => {
+exports.assignScoreCriminal = async (caseItem) => {
     /*
         CRIMINAL CASE
             Preference Order
@@ -129,37 +139,64 @@ const assignScoreCriminal = async (caseItem) => {
             * 5. IsFinal Hearing
     */
 
-    // 0. IPC Act
-    const ipcActScore = getIpcSectionScore();
-    
-    // 1. Date of registration
+    // 0. IPC Act - done
+    const ipcActScore = getIpcSectionScore(caseItem);
+
+    // 1. Date of registration - done
     const dateScore = getDateScore(caseItem.caseInfo.regDate);
-    
+
     // 2. Severity Analysis Score
-    const severityScore = getSeverityScore();
-    
-    // 3. Number of hearing
-    const hearingCountScore = getHearingCountScore();
-    
+    const severityScore = getSeverityScore(caseItem);
+
+    // 3. Number of hearing - done
+    const hearingCountScore = getHearingCountScore(caseItem);
+
     // 4. Evidence (Value score ->kuch Particular value assign krna hai isko ?)
-    const evidencesScore = getEvidenceScore();
-    
-    // 5. IsFinal Hearing
-    const finalArgumentScore = getFinalArgumentScore();
+    const evidencesScore = getEvidenceScore(caseItem);
+
+    // 5. IsFinal Hearing - done
+    const finalArgumentScore = getFinalArgumentScore(caseItem);
 
     // Total score
     const totalScore = ipcActScore + dateScore + severityScore + hearingCountScore + evidencesScore + finalArgumentScore;
 
     const result = RegisteredCase.findByIdAndUpdate(caseItem._id, {
         score: totalScore,
-    }).exec();
+    }, {new: true}).exec();
+
+    return result;
+
 }
 
-const getIpcSectionScore = () => {
-    return 0;
+const getIpcSectionScore = (caseItem) => {
+
+    if (caseItem.caseHearing.caseDescription.actSection.length) {
+        let sectionScore = 0;
+        const actSection = caseItem.caseHearing.caseDescription.actSection;
+
+        for (let i = 0; j < actSection.length; i++) {
+            const item = actSection[i];
+
+            sectionScore += ipcSectionMap.get(item.section);
+        }
+
+        return sectionScore;
+    } else {
+        let sectionScore = 0;
+        const actSection = caseItem.actSection;
+
+        for (let i = 0; j < actSection.length; i++) {
+            const item = actSection[i];
+
+            sectionScore += ipcSectionMap.get(item.section);
+        }
+
+        return sectionScore;
+    }
+
 }
 
-const getSeverityScore = () => {
+const getSeverityScore = (caseItem) => {
     return 0;
 }
 
@@ -187,8 +224,6 @@ const getHearingCountScore = (caseItem) => {
     return caseItem.caseHearing.length;
 }
 
-// TODO -------------------------------------------
-
 const getFinalArgumentScore = (caseItem) => {
     if (caseItem.finalArgument === true) {
         return 20;
@@ -198,19 +233,38 @@ const getFinalArgumentScore = (caseItem) => {
 }
 
 const getEvidenceScore = (caseItem) => {
-    const evidence = caseItem.evidence;
+    if (caseItem.caseHearing.caseDescription.evidence.length) {
+        const evidence = caseItem.caseHearing.evidence;
 
-    let primaryEvdCnt = 0;
+        let primaryEvdCnt = 0;
 
-    for (let i = 0; i < evidence.length; i++) {
-        if (evidence[i].type === 'primary') {
-            primaryEvdCnt++;
+        for (let i = 0; i < evidence.length; i++) {
+            if (evidence[i].type === 'primary') {
+                primaryEvdCnt++;
+            }
         }
+
+        let evdScore = 0;
+        evdScore += primaryEvdCnt * 2 + (evidence.length - primaryEvdCnt);
+
+        return evdScore;
+    } else {
+        const evidence = caseItem.evidence;
+
+        let primaryEvdCnt = 0;
+
+        for (let i = 0; i < evidence.length; i++) {
+            if (evidence[i].type === 'primary') {
+                primaryEvdCnt++;
+            }
+        }
+
+        let evdScore = 0;
+        evdScore += primaryEvdCnt * 2 + (evidence.length - primaryEvdCnt);
+
+        return evdScore;
     }
 
-    const evdScore = primaryEvdCnt * 2 + (evidence.length-primaryEvdCnt);
-
-    return evdScore;
 }
 
 
