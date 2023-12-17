@@ -128,8 +128,6 @@ const schedulingAlgo = async (courtId, type) => {
 
 
 
-<<<<<<< HEAD
-=======
 
         // TODO - problem in not fixed cases
 
@@ -143,7 +141,6 @@ const schedulingAlgo = async (courtId, type) => {
         // console.log('fixed cases -> ', fixedCases);
 
 
->>>>>>> 3981c5d8a0824bcfe893138dc71f870fbfd0626b
 
 
 
@@ -731,9 +728,6 @@ schedule.scheduleJob(interval, createAndUpdateSchedules);
 
 
 
-<<<<<<< HEAD
-// Yaha se mai same level pe aagya hu 
-=======
 
 
 
@@ -742,4 +736,3 @@ schedule.scheduleJob(interval, createAndUpdateSchedules);
 
 
 
->>>>>>> 3981c5d8a0824bcfe893138dc71f870fbfd0626b

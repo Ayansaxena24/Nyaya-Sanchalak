@@ -4,6 +4,7 @@ const constFactor = 2;
 
 const assignScoreCivil = (caseItem) => {
     /*
+
         Preference Order
         * 0. Track
         * 1. Date of registration
@@ -103,7 +104,7 @@ const getFamilyDisputeScore=()=>{
 
 // TODO ------------------------------------------------
 
-const assignScoreCriminal = () => {
+const assignScoreCriminal = async(caseItem) => {
 
 }
 
