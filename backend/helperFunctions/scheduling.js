@@ -75,7 +75,7 @@ const getInjuctionScore = () => {
     return 0;
 }
 
-const getValuationScore = ()=>{
+const getValuation= ()=>{
     // const const ka input dekhna padega
     // var cost;
     // return cost*1e-9;
