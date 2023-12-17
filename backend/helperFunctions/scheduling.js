@@ -18,13 +18,13 @@ const assignScoreCivil = (caseItem) => {
         * 9. Number of Hearing
     */
 
-    // 1. Track
+    // 1. Track ->Done
     const trackScore = getTrackScore(caseItem.track);
 
-    // 2. Date difference
+    // 2. Date difference ->Done
     const dateScore = getDateScore(caseItem.caseInfo.regDate, 2);
 
-    // 3. Final argument
+    // 3. Final argument >
     const finalArgumentScore = getFinalArgumentScore();
 
     // 4. Evidences 
@@ -35,12 +35,12 @@ const assignScoreCivil = (caseItem) => {
     const injuctionSore = getInJuctionScore();
 
     // 6.Valuation of function  (3 cror,100 crore etc)
-    const valuation=getValuation();
+    // const valuation=getValuation();
 
     // 7. Amendemant / Inspection
     const amendemant=getAmendemantScore();
 
-    // 8. Number of Hearing
+    // 8. Number of Hearing ->Done
     const scoreHearingCount=getHearingCount();
 
     // 9.Family Dispute
@@ -50,15 +50,14 @@ const assignScoreCivil = (caseItem) => {
 
 
 }
-
 const getTrackScore = (track) => {
     switch (track) {
         case 1:
-            return 1;
+            return 50;
         case 2:
-            return 3;
+            return 35;
         case 3:
-            return 5;
+            return 15;
         default:
             return 0;
     }
@@ -90,7 +89,8 @@ const getAmendemantScore = () => {
     return 0;
 }
 
-const getFamilyDisputeScore=()=>{
+const getFamilyDisputeScore=(caseItem)=>{
+    
     // This will depend upon partiton adoption and succession. The values Are yet to be determined for the same
     // return 1;
     return 0;
@@ -148,6 +148,7 @@ const getFinalArgumentScore = () => {
 }
 
 const getEvidenceScore = () => {
+    
     return 0;
 }
 

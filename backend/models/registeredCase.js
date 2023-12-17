@@ -334,10 +334,19 @@ const registeredCaseSchema = new mongoose.Schema({
         type: Number,
         required: [true, "Track is required!"],
     }, 
-    finalArgement: {
+    finalArgument: {
         type: Boolean,
         default: false,
-    }
+    },
+    evidenceType:[
+        {
+            type:String,
+            casedescription:String,
+        }
+    ]
+       
+
+    
 }, {timestamps: true});
 
 module.exports = mongoose.model('RegisteredCase', registeredCaseSchema);
