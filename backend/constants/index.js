@@ -39,7 +39,7 @@ const stateMap = new Map([
 ])
 
 //Trial Purpose Only
-const ipcSections = new Map([
+const ipcSectionMap = new Map([
     ["Section 302",100],
     ["Section 304",95],
     ["Section 420",50],
@@ -65,4 +65,56 @@ const ipcSections = new Map([
     // ["Section 323",10],
 ])
 
-module.exports = {stateMap,ipcSections}
+// Track mapping
+const trackMap = new Map([
+    ['Matters relating to maintenance', 1],
+    ['Matters relating to guardianship or custody of children', 1],
+    ['Matters relating to adoption', 1],
+    ['Matters relating to visitation rights', 1],
+    ['Matters relating to the grant of Letter of Administration, Probate and Succession Certificate', 1],
+    ['Original Proceedings and appeals under the Kerala Buildings (Lease and Rent Control) Act, 1965 (Act 2 of 1965)', 1],
+    ['All Civil Miscellaneous appeals', 1],
+    ['Suits for money', 1],
+    ['Proceedings under the Mental Health Act,1987 (Central Act 14 of 1987)', 1],
+    ['Proceedings for transfer of matters pending before Civil Courts', 1],
+    ['All summary suits', 1],
+
+    ['Matters relating to matrimonial disputes not falling under track I', 2],
+    ['Suits for eviction', 2],
+    ['Suits for injunction', 2],
+    ['Claim petitions under the Motor Vehicles Act, 1988 (Central Act 59 of 1988)', 2],
+    ['Land Acquisition references and petitions for compensation relating to property under other different legislations like Telegraph Act, 1885 (Central Act 13 of 1885), Petroleum Act, 1934 (Central Act 30 of 1934) etc', 2],
+    ['Proceedings under the Arbitration and Conciliation Act, 1996 (Central Act 26 of 1996)', 2],
+    ['Suits under the Fatal Accident Act, 1855', 2],
+    ['Suits and other proceedings relating to Intellectual Property Rights', 2],
+
+    ['Suits for partition', 3],
+    ['Suits for declaratory relief', 3],
+    ['Suits for specific performance', 3],
+    ['Suits for possession', 3],
+    ['All appeals other than Civil Miscellaneous Appeals and appeals under the Kerala Buildings (Lease and Rent Control) Act, 1965 (Act 2 of 1965)', 3],
+    ['Suits for damages', 3],
+    ['Suits relating to easement rights', 3],
+    ['Suits and other proceedings relating to trust property', 3],
+    ['Proceedings under the Insolvency Act, 1955 (Act 2 of 1956)', 3],
+    ['Suits for accounts', 3],
+    ['Matters relating to execution', 3],
+    ['Such other cases not included elsewhere', 3],
+])
+
+// case type mapping
+
+const caseTypeMap = new Map([
+    ['', ''],
+    ['', ''],
+    ['', ''],
+    ['', ''],
+    ['', ''],
+    ['', ''],
+    ['', ''],
+    ['', ''],
+    ['', ''],
+    ['', ''],
+])
+
+module.exports = {stateMap, ipcSectionMap, trackMap}
