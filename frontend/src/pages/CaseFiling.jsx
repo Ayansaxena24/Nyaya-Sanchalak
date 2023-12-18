@@ -6,6 +6,9 @@ import { useState } from "react";
 import axios from "./api/axios";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { useDispatch, useSelector } from "react-redux";
+import user from "../assets/Images/user.png";
+import judge3 from "../assets/Images/judge3.png";
 
 const FILINGURL = "/court/file-case";
 
@@ -49,6 +52,19 @@ const CaseFiling = () => {
 
   const [errMsg, setErrMsg] = useState("");
   const [success, setSuccess] = useState(false);
+
+  const { userInfo } = useSelector((state) => state.signIn);
+  const dispatch = useDispatch();
+  // console.log("USER ROLE", userInfo.roles);
+
+  //log out user
+  const logOutUser = () => {
+    dispatch(userLogOutAction());
+    window.location.reload(true);
+    setTimeout(() => {
+      Navigate('/');
+    }, 500)
+ }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -161,20 +177,49 @@ const CaseFiling = () => {
                 </p>
               </div>
               <p className=" hover:text-green-600 hover:border-green-600 duration-300 ease-in-out">
-                <Link to="/caseregistration"> Case Registration </Link>
+                <Link to="/admin/caseregistration"> Case Registration </Link>
               </p>
-              <p className="absolute pl-4 left-0 duration-300 ease-in-out w-[300px] bg-green-300">
+              <p className="absolute pl-4 left-0 duration-300 ease-in-out w-[300px] font-semibold text-lg shadow-green-400 shadow-md">
                 {" "}
                 Case Filing{" "}
               </p>
             </div>
           </div>
         </div>
-        <div className="flex pb-10 w-full justify-center">
-          <button className="flex rounded-lg justify-center border-2 border-gray-400 px-20 mr-2 font-bold py-2 hover:text-green-600 hover:border-green-600 duration-300 ease-in-out">
-            {" "}
-            Log Out{" "}
-          </button>
+        <div className="flex flex-col pb-10 w-full justify-center space-y-4">
+          <div className="flex flex-col justify-center items-center text-center w-full mt-4">
+            {userInfo?.roles[0] === 8888 ? (
+              <img className="h-36 w-36 rounded-full" src={judge3}></img>
+            ) : userInfo?.roles[0] === 9999 ? (
+              <img
+                className="h-36 w-36 rounded-full"
+                src="https://png.pngtree.com/png-clipart/20220726/original/pngtree-internet-search-information-read-hand-book-with-mause-png-image_8409603.png"
+              ></img>
+            ) : (
+              <img className="h-36 w-36 rounded-full" src={user}></img>
+            )}
+            <p>
+              Welcome,{" "}
+              {userInfo?.roles[0] === 8888 ? (
+                <span className="font-bold">Judge</span>
+              ) : userInfo?.roles[0] === 9999 ? (
+                <span className="font-bold">Admin</span>
+              ) : (
+                <span className="font-bold">User</span>
+              )}
+            </p>
+          </div>
+          {(userInfo?.roles[0] === 8888 || userInfo?.roles[0] === 9999) ? (
+            <button className="flex rounded-lg justify-center border-2 border-gray-400 px-20 mr-2 font-bold py-2 hover:text-green-600 hover:border-green-600 duration-300 ease-in-out"
+            onClick={logOutUser} >
+              Log Out
+            </button>
+          ) : (
+            <button className="flex rounded-lg justify-center border-2 border-gray-400 px-20 mr-2 font-bold py-2 hover:text-green-600 hover:border-green-600 duration-300 ease-in-out"
+            >
+              <Link to="/login"> Log In </Link>
+            </button>
+          )}
         </div>
       </div>
 

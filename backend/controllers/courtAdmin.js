@@ -1,6 +1,11 @@
+const uniqid = require('uniqid')
+
 const User = require('../models/User');
 const FiledCase = require('../models/FiledCase');
 const RegisteredCase = require('../models/RegisteredCase');
+const {stateMap, trackMap} = require('../constants/index');
+const Court = require('../models/Court');
+
 
 // ----------------------------------- File case -------------------------------------------
 
@@ -9,7 +14,7 @@ exports.getAllFiledCases = async (req, res) => {
 
 }
 
-// read one
+// read on7e
 exports.getFiledCase = async (req, res) => {
     
 
@@ -20,32 +25,30 @@ exports.fileCase = async (req, res) => {
     try {
         // const data = req.body;
         // const response = await FiledCase.create(data);
-        console.log(req.body);
-        const {category, caseType, plaintiffDetails, defendantDetails, valuation, amount, filingDateAndTime} = req.body;
+        const {category, caseType, plaintiffDetails, defendantDetails, valuation, amount, filingDate, filingTime, prayer, reliefClaimed, causeOfAction, act1, actSection1, causeOfActionDate, courtId} = req.body;
+        const court = await Court.findById(courtId).exec();
+
+        const state = court ? court.location.state : 'Uttar Pradesh';
 
         const date = new Date(filingDateAndTime);
 
-        const districtCode = 'UP'
+        // TODO --
+        const districtCode = stateMap.get(state);
+        
         const establishmentCode = 'LL05'
-        const caseFilingNum = ''
+        const caseFilingNum = uniqid();
         const yearOfCaseFiling = date.getFullYear();
 
-        let filingNum = districtCode + '/' + '6rgfyt' + '/' + yearOfCaseFiling
-        let cnrNum = districtCode + '-' + establishmentCode + '-' + caseFilingNum + '-' + yearOfCaseFiling;
+        let filingNum = 'RCC' + '/' + caseFilingNum + '/' + yearOfCaseFiling
+        let cnrNum = districtCode + establishmentCode + '-' + caseFilingNum + '-' + yearOfCaseFiling;
 
         const response = await FiledCase.create({
-            category, caseType, plaintiffDetails, defendantDetails, valuation, amount, filingDateAndTime, filingNum, cnrNum
+            category, caseType, plaintiffDetails, defendantDetails, valuation, amount, filingDate, filingTime, prayer, reliefClaimed, causeOfAction, act1, actSection1, causeOfActionDate, filingNum, cnrNum
         });
-        res.status(200).json({
-            success: true,
-            response
-        });
+        res.status(200).json(response);
     } catch (error) {
         console.log(error);
-        res.status(500).json({
-            success: false,
-            response: "Failed to file case."
-        })
+        res.status(500).json("Internal server error!")
     }
 }
 
@@ -54,16 +57,10 @@ exports.updateFiledCase = async (req, res) => {
     try {
         const {data, _id} = req.body;
         const response = await FiledCase.findByIdAndUpdate(_id, data, {new: true}).exec();
-        res.status(200).json({
-            success: true,
-            response
-        });
+        res.status(200).json(response);
     } catch (error) {
         console.log(error);
-        res.status(500).json({
-            success: false,
-            response: "Failed to update filed case."
-        })
+        res.status(500).json("Internal server error!")
     }
 }
 
@@ -72,16 +69,10 @@ exports.removeFiledCase = async (req, res) => {
     try {
         const {_id} = req.body;
         const response = await FiledCase.findByIdAndRemove(_id).exec();
-        res.status(200).json({
-            success: true,
-            response
-        });
+        res.status(200).json(response);
     } catch (error) {
         console.log(error);
-        res.status(500).json({
-            success: false,
-            response: "Failed to remove filed case."
-        })
+        res.status(500).json("Internal server error")
     }
 }
 
@@ -89,49 +80,30 @@ exports.removeFiledCase = async (req, res) => {
 // ----------------------------------- Register case -------------------------------------------
 
 
-exports.savePetitioner = async (req, res) => {
-    
-}
-
-exports.saveRespondent = async (req, res) => {
-
-}
-
-exports.saveExtraInfo = async (req, res) => {
-
-}
-
-exports.saveActSection = async (req, res) => {
-
-}
-
-exports.savePoliceStation = async (req, res) => {
-
-}
-
-exports.saveExtraParty = async (req, res) => {
-
-}
-
-exports.saveCaseDetails = async (req, res) => {
-
-}
-
 exports.registerCase = async (req, res) => {
-    console.log(req.body);
     try {
-        const data = req.body;
-        const response = await RegisteredCase.create(data);
-        res.status(200).json({
-            success: true,
-            response
+        const {filingNum, petitioner, respondent, extraInfo, actSection, policeStation, extraParty, caseDetails, registration, caseInfo, caseStatus, caseHearing, courtId, score, finalArgument, evidence, category} = req.body;
+        const date = new Date();
+        // const caseHistory = [
+        //     {
+        //         status: 'registered',
+        //         date: date,
+        //         court: courtId,
+        //     }
+        // ]
+
+        // const filedCase = await FiledCase.fi
+
+        const track = trackMap.get(caseInfo.caseType);
+
+        const response = await RegisteredCase.create({
+            petitioner, respondent, extraInfo, actSection, policeStation, extraParty, caseDetails, registration, caseInfo, courtId,
+            caseStatus, caseHearing, score, track, finalArgument, evidence, category
         });
+        res.status(200).json(response);
     } catch (error) {
         console.log(error);
-        res.status(500).json({
-            success: false,
-            response: "Failed to register case."
-        })
+        res.status(500).json("Internal server error!")
     }
 }
 
@@ -149,16 +121,10 @@ exports.updateRegisteredCase = async (req, res) => {
     try {
         const {data, _id} = req.body;
         const response = await RegisteredCase.findByIdAndUpdate(_id, data, {new: true}).exec();
-        res.status(200).json({
-            success: true,
-            response
-        });
+        res.status(200).json(response);
     } catch (error) {
         console.log(error);
-        res.status(500).json({
-            success: false,
-            response: "Failed to update registered case."
-        })
+        res.status(500).json("Internal server error!")
     }
 }
 
@@ -166,16 +132,10 @@ exports.removeRegisteredCase = async (req, res) => {
     try {
         const {_id} = req.body;
         const response = await RegisteredCase.findByIdAndDelete(_id).exec();
-        res.status(200).json({
-            success: true,
-            response
-        });
+        res.status(200).json(response);
     } catch (error) {
         console.log(error);
-        res.status(500).json({
-            success: false,
-            response: "Failed to remove registered case."
-        })
+        res.status(500).json("Internal server error!")
     }
 }
 

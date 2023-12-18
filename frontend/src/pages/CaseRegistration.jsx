@@ -22,12 +22,28 @@ import {
   ModalCloseButton,
 } from "@chakra-ui/react";
 import axios from "./api/axios";
+import { useDispatch, useSelector } from "react-redux";
+import user from "../assets/Images/user.png";
+import judge3 from "../assets/Images/judge3.png";
 
 const REGISTRATIONURL = '/court/register-case';
 
 const CaseRegistration = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [success, setSuccess] = useState(false);
+
+  const { userInfo } = useSelector((state) => state.signIn);
+  const dispatch = useDispatch();
+  // console.log("USER ROLE", userInfo.roles);
+
+  //log out user
+  const logOutUser = () => {
+    dispatch(userLogOutAction());
+    window.location.reload(true);
+    setTimeout(() => {
+      Navigate('/');
+    }, 500)
+ }
 
   const [mainCaseType, setMainCaseType] = useState("");
   const [mainFilingNumber, setMainFilingNumber] = useState("");
@@ -101,8 +117,7 @@ const CaseRegistration = () => {
   const [resVillage, setResVilage] = useState("");
 
   //act details
-  const [act, setAct] = useState("");
-  const [section, setSection] = useState("");
+const [actSets, setActSets] = useState([{ act: '', section: '' }]);  
 
   //police station details
   const [policeChallanOrPrivateComplaint, setPoliceChallanOrPrivateComplaint] = useState("");
@@ -162,7 +177,11 @@ const CaseRegistration = () => {
   const [regCaseType, setRegCaseType] = useState("");
   const [regNature, setRegNature] = useState("");
 
- 
+  // Function to handle adding a new Act set
+  const handleAddAct = () => {
+    const newActSet = { act: '', section: '' };
+    setActSets([...actSets, newActSet]);
+  };
 
   // handlesubmit function
   const handleSubmit = async (e) => {
@@ -534,20 +553,49 @@ const CaseRegistration = () => {
                 <p>--</p>
                 <p className="pl-2"> <Link to="/dailycalendar"> View Daily Schedule </Link></p>
               </div>
-              <p className="absolute pl-4 left-0 duration-300 ease-in-out w-[300px] bg-green-300">
+              <p className="absolute pl-4 left-0 duration-300 ease-in-out w-[300px] font-semibold text-lg shadow-green-400 shadow-md">
                 Case Registration
               </p>
               <p className=" hover:text-green-600 hover:border-green-600 duration-300 ease-in-out pt-8">
-                <Link to="/casefiling"> Case Filing </Link>
+                <Link to="/admin/casefiling"> Case Filing </Link>
               </p>
             </div>
           </div>
         </div>
-        <div className="flex pb-10 w-full justify-center">
-          <button className="flex rounded-lg justify-center border-2 border-gray-400 px-20 mr-2 font-bold py-2 hover:text-green-600 hover:border-green-600 duration-300 ease-in-out">
-            {" "}
-            Log Out{" "}
-          </button>
+        <div className="flex flex-col pb-10 w-full justify-center space-y-4">
+          <div className="flex flex-col justify-center items-center text-center w-full mt-4">
+            {userInfo?.roles[0] === 8888 ? (
+              <img className="h-36 w-36 rounded-full" src={judge3}></img>
+            ) : userInfo?.roles[0] === 9999 ? (
+              <img
+                className="h-36 w-36 rounded-full"
+                src="https://png.pngtree.com/png-clipart/20220726/original/pngtree-internet-search-information-read-hand-book-with-mause-png-image_8409603.png"
+              ></img>
+            ) : (
+              <img className="h-36 w-36 rounded-full" src={user}></img>
+            )}
+            <p>
+              Welcome,{" "}
+              {userInfo?.roles[0] === 8888 ? (
+                <span className="font-bold">Judge</span>
+              ) : userInfo?.roles[0] === 9999 ? (
+                <span className="font-bold">Admin</span>
+              ) : (
+                <span className="font-bold">User</span>
+              )}
+            </p>
+          </div>
+          {(userInfo?.roles[0] === 8888 || userInfo?.roles[0] === 9999) ? (
+            <button className="flex rounded-lg justify-center border-2 border-gray-400 px-20 mr-2 font-bold py-2 hover:text-green-600 hover:border-green-600 duration-300 ease-in-out"
+            onClick={logOutUser} >
+              Log Out
+            </button>
+          ) : (
+            <button className="flex rounded-lg justify-center border-2 border-gray-400 px-20 mr-2 font-bold py-2 hover:text-green-600 hover:border-green-600 duration-300 ease-in-out"
+            >
+              <Link to="/login"> Log In </Link>
+            </button>
+          )}
         </div>
       </div>
 
@@ -572,6 +620,7 @@ const CaseRegistration = () => {
             <div className="flex space-x-2">
               <p>Filing Number</p>
               <input className="border-2 border-gray-400 rounded-md" onChange={(e) => setMainFilingNumber(e.target.value)}></input>
+              <button className="bg-[#49AE52] text-white rounded-md px-2 pb-0.5 hover:scale-110 duration-300 ease-in-out"> GO </button>
             </div>
           </div>
           <div className="flex justify-center items-center space-y-1"></div>

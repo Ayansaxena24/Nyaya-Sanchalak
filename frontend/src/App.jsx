@@ -11,9 +11,12 @@ import Calendar from './pages/Calendar'
 import DailyCalendar from './pages/DailyCalendar'
 import Users from './pages/components/Users'
 import Register from './pages/Auth/Register'
+import JudgeEdit from './pages/JudgeEdit'
+
+const CaseRegistrationHOC = CaseRegistration; 
+const CaseFilingHOC = CaseFiling; 
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
     <>
@@ -24,11 +27,12 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           {/* <Route path="/test" element={<Test />} /> */}
-          <Route path="/casefiling" element={<CaseFiling />} />
-          <Route path="/caseregistration" element={<CaseRegistration />} />
+          <Route path="/admin/casefiling" element={<CaseFiling />} />
+          <Route path="/admin/caseregistration" element={<CaseRegistration />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/dailycalendar" element={<DailyCalendar />} />
           <Route path="/admin" element={<Users />} />
+          <Route path="/editCases" element={<JudgeEdit />} />
         </Routes>
       </BrowserRouter>
       </div>

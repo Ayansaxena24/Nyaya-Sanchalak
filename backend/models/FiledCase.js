@@ -5,7 +5,7 @@ const {ObjectId} = mongoose.Schema;
 const filedCaseSchema = new mongoose.Schema({
     category: {
         type: String,
-        enum: ['civil', 'criminal', 'ceveatfiling'],
+        enum: ['civil', 'criminal', 'caveat filing'],
         required: [true, 'case category is required!'],
     },
     caseType: {
@@ -75,8 +75,29 @@ const filedCaseSchema = new mongoose.Schema({
     amount: {
         type: String,
     },
-    filingDateAndTime: {
+    filingDate: {
+        type: Date,
+    },
+    filingTime: {
         type: String,
+    },
+    prayer: {
+        type: String,
+    },
+    reliefClaimed: {
+        type: String,
+    },
+    causeOfAction: {
+        type: String,
+    },
+    act1: {
+        type: String,
+    },
+    actSection1: {
+        type: String,
+    },
+    causeOfActionDate: {
+        type: Date,
     },
 
     filingNum: {

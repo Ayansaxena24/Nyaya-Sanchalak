@@ -11,6 +11,8 @@ const { credentials } = require('./middlewares/credentials');
 const { connectToMongoDB } = require('./config/dbConnection');
 const corsOptions = require('./config/corsOptions');
 
+const scheduler = require('./controllers/scheduler')
+
 // app
 const app = express();
 

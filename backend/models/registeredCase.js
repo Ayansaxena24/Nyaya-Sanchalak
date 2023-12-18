@@ -52,7 +52,7 @@ const registeredCaseSchema = new mongoose.Schema({
         },
         gender: {
             type: String,
-            enum: ['male', 'female', 'other'],
+            // enum: ['male', 'female', 'other'],
         },
         age: {
             type: String,
@@ -79,6 +79,11 @@ const registeredCaseSchema = new mongoose.Schema({
             town: String,
             ward: String,
             taluka: String,
+            village: String,
+        },
+        policeStation: {
+            policeStationCode: String,
+            uidNum: String,
         }
     },
     extraInfo: {
@@ -171,7 +176,7 @@ const registeredCaseSchema = new mongoose.Schema({
         firType: {
             type: String,
         },
-        firString: {
+        firNumber: {
             type: String,
         },
         year: {
@@ -199,14 +204,14 @@ const registeredCaseSchema = new mongoose.Schema({
     extraParty: {
         type: {
             type: String,
-            enum: ['complaint', 'accused'],
+            // enum: ['complaint', 'accused'],
         },
         complainantOrAccused: {
             type: String,
         },
         gender: {
             type: String,
-            enum: ['male', 'female', 'other'],
+            // enum: ['male', 'female', 'other'],
         },
         relation: {
             type: String,
@@ -294,10 +299,11 @@ const registeredCaseSchema = new mongoose.Schema({
 
     caseStatus: {
         type: String,
-        default: 'pending',
-        enum: ['pending', ''],
+        default: 'not heard',
+        enum: ['not heard', 'pending', 'closed'],
     },
-    caseHistory: [
+
+    caseHearing: [
         {
             status: String,
             date: Date,
@@ -305,7 +311,26 @@ const registeredCaseSchema = new mongoose.Schema({
                 type: ObjectId,
                 ref: 'Court',
             },
-            score: Number,
+            score: {
+                type: Number,
+                default: 0,
+            },
+
+            caseDescription: {
+                facts: [],
+                evidence: [
+                    {
+                        type: String,
+                        description: String,
+                    }
+                ],
+                actSection: [
+                    {
+                        act: String,
+                        section: String,
+                    }
+                ],
+            }
         }
     ],
 
@@ -313,14 +338,30 @@ const registeredCaseSchema = new mongoose.Schema({
         type: ObjectId,
         ref: 'Court'
     },
-
-    prevScore: {
+    score: {
         type: Number,
         default: 0,
     },
-    currScore: {
+    
+    track: {
         type: Number,
-        default: 0,
+        required: [true, "Track is required!"],
+    }, 
+    finalArgument: {
+        type: Boolean,
+        default: false,
+    },
+
+    evidence: [
+        {
+            type: String,
+            description: String,
+        }
+    ],
+    category: {
+        type: String,
+        enum: ['civil', 'criminal', 'caveat filing'],
+        required: [true, 'case category is required!'],
     }
 }, {timestamps: true});
 
