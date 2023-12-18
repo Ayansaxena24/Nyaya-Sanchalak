@@ -315,8 +315,18 @@ const registeredCaseSchema = new mongoose.Schema({
 
             caseDescription: {
                 facts: [],
-                evidence: [],
-                acts: [],
+                evidence: [
+                    {
+                        type: String,
+                        description: String,
+                    }
+                ],
+                actSection: [
+                    {
+                        act: String,
+                        section: String,
+                    }
+                ],
             }
         }
     ],
@@ -337,6 +347,19 @@ const registeredCaseSchema = new mongoose.Schema({
     finalArgument: {
         type: Boolean,
         default: false,
+    }
+    },
+
+    evidence: [
+        {
+            type: String,
+            description: String,
+        }
+    ],
+    category: {
+        type: String,
+        enum: ['civil', 'criminal', 'caveat filing'],
+        required: [true, 'case category is required!'],
     }
 }, {timestamps: true});
 

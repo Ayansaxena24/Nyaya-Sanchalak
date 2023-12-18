@@ -4,7 +4,7 @@ const RegisteredCase = require('../models/RegisteredCase')
 const Court = require('../models/Court')
 const Schedule = require('../models/Schedule')
 
-
+const { assignScoreCivil, assignScoreCriminal } = require('../helperFunctions/scheduling')
 
 
 // const interval = '0 0 */3 * *'; // every 3 days
@@ -79,7 +79,6 @@ const schedulingAlgo = async (courtId, type) => {
     } else {
         scheduleCriminalCases(courtId);
     }
-
 
 
     try {
@@ -244,25 +243,66 @@ const scheduleCivilCases = async (courtId) => {
     //     caseStatus: 'pending'
     // })
 
-    const allCases = await RegisteredCase.find({
-        courtId
-    })
+    const deletedSchedule = await Schedule.findOneAndDelete({
+        court: courtId
+    }).exec();
 
+    const allCases = await RegisteredCase.find({
+        courtId,
+        category: 'civil'
+    }).exec();
 
     // Track wise case list
-    const allTrack1cases = allCases.filter(caseObj => caseObj.track === 1);
-    const allTrack2cases = allCases.filter(caseObj => caseObj.track === 2);
-    const allTrack3cases = allCases.filter(caseObj => caseObj.track === 3);
+    // const allTrack1cases = allCases.filter(caseObj => caseObj.track === 1);
+    // const allTrack2cases = allCases.filter(caseObj => caseObj.track === 2);
+    // const allTrack3cases = allCases.filter(caseObj => caseObj.track === 3);
+
+    let casesToBeScheduled = [];
+
+    for (let i = 0; i < allCases.length; i++) {
+        let caseItem = allCases[i];
+
+        caseItem = await assignScoreCivil(caseItem);
+
+        scoredCases.push(caseItem);
+    }
+
+
+    casesToBeScheduled.sort((a, b) => b.score - a.score);
+
+    const schedule = new Schedule({
+        cases: [],
+        court: courtId,
+    })
+
+    // let schedule = {
+    //     cases: [],
+    //     court: courtId,
+    // }
+
+    for (const caseItem of casesToBeScheduled) {
+        const dateAndTime = assignTimeSlots(existingSchedule);
+
+        if (dateAndTime) {
+            schedule.cases.push({ caseId: caseItem._id, dateAndTime });
+        } else {
+            console.log(`Could not schedule case ${caseItem._id}. No available slots.`);
+        }
+    }
+
+    await schedule.save();
+
+    console.log('schedule -> ', schedule);
 
     // Not heard cases
-    const notHeardCasesTrack1 = allTrack1cases.filter(caseObj => caseObj.caseStatus === 'not heard');
-    const notHeardCasesTrack2 = allTrack2cases.filter(caseObj => caseObj.caseStatus === 'not heard');
-    const notHeardCasesTrack3 = allTrack3cases.filter(caseObj => caseObj.caseStatus === 'not heard');
+    // const notHeardCasesTrack1 = allTrack1cases.filter(caseObj => caseObj.caseStatus === 'not heard');
+    // const notHeardCasesTrack2 = allTrack2cases.filter(caseObj => caseObj.caseStatus === 'not heard');
+    // const notHeardCasesTrack3 = allTrack3cases.filter(caseObj => caseObj.caseStatus === 'not heard');
 
     // Pending Case
-    const pendingCaseTrack1 = allTrack1cases.filter(caseObj => caseObj.caseStatus === 'pending');
-    const pendingCaseTrack2 = allTrack2cases.filter(caseObj => caseObj.caseStatus === 'pending');
-    const pendingCaseTrack3 = allTrack3cases.filter(caseObj => caseObj.caseStatus === 'pending');
+    // const pendingCaseTrack1 = allTrack1cases.filter(caseObj => caseObj.caseStatus === 'pending');
+    // const pendingCaseTrack2 = allTrack2cases.filter(caseObj => caseObj.caseStatus === 'pending');
+    // const pendingCaseTrack3 = allTrack3cases.filter(caseObj => caseObj.caseStatus === 'pending');
 
 
 
@@ -473,14 +513,3 @@ const createAndUpdateSchedules = async () => {
 
 // Schedule the function to run at the specified interval
 schedule.scheduleJob(interval, createAndUpdateSchedules);
-
-
-
-
-
-
-
-
-
-
-
