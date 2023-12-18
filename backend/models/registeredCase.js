@@ -254,6 +254,7 @@ const registeredCaseSchema = new mongoose.Schema({
     caseDetails: {
         info: {
             type: String,
+            required: [true, 'Case desc is required!']
         },
         valuation: {
             type: String
@@ -311,7 +312,10 @@ const registeredCaseSchema = new mongoose.Schema({
                 type: ObjectId,
                 ref: 'Court',
             },
-            score: Number,
+            score: {
+                type: Number,
+                default: 0,
+            },
 
             caseDescription: {
                 facts: [],

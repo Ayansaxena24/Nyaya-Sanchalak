@@ -5,8 +5,6 @@ const constFactor = 2;
 
 const { trackMap, ipcSectionMap } = require('../constants/index');
 
-// Civil case functions
-
 exports.assignScoreCivil = async (caseItem) => {
     /*
         Preference Order
@@ -62,6 +60,8 @@ exports.assignScoreCivil = async (caseItem) => {
     const totalScore = trackScore + dateScore + finalArgumentScore + evidencesScore + hearingCountScore + anupamScore;
     /* reliefScore + injuctionSore +  valuation + amendemant + disputeScore + */
 
+    console.log(`total civil score for ${caseItem._id} is ${totalScore}`);
+
     const result = await RegisteredCase.findByIdAndUpdate(caseItem._id, {
         score: totalScore,
     }, {new: true}).exec();
@@ -69,6 +69,53 @@ exports.assignScoreCivil = async (caseItem) => {
     return result;
 
 }
+
+exports.assignScoreCriminal = async (caseItem) => {
+    /*
+        CRIMINAL CASE
+            Preference Order
+            * 0. IPC Act
+            * 1. Date of registration
+            * 2. Severity Analysis Score
+            * 3. Number of hearing
+            * 4. Evidence (Value score ->kuch Particular value assign krna hai isko ?)
+            * 5. IsFinal Hearing
+    */
+
+    // 0. IPC Act - done
+    const ipcActScore = getIpcSectionScore(caseItem);
+
+    // 1. Date of registration - done
+    const dateScore = getDateScore(caseItem.caseInfo.regDate);
+
+    // 2. Severity Analysis Score
+    const severityScore = getSeverityScore(caseItem);
+
+    // 3. Number of hearing - done
+    const hearingCountScore = getHearingCountScore(caseItem);
+
+    // 4. Evidence (Value score ->kuch Particular value assign krna hai isko ?)
+    const evidencesScore = getEvidenceScore(caseItem);
+
+    // 5. IsFinal Hearing - done
+    const finalArgumentScore = getFinalArgumentScore(caseItem);
+
+    // Total score
+    const totalScore = ipcActScore + dateScore + severityScore + hearingCountScore + evidencesScore + finalArgumentScore;
+
+    console.log(`total criminal score for ${caseItem._id} is ${totalScore}`);
+
+    const result = RegisteredCase.findByIdAndUpdate(caseItem._id, {
+        score: totalScore,
+    }, {new: true}).exec();
+
+    return result;
+
+}
+
+
+
+// Civil case functions
 
 const getTrackScore = (track) => {
     switch (track) {
@@ -126,47 +173,6 @@ const getAnupamScore = () => {
 // Criminal case functions
 
 // TODO ------------------------------------------------
-
-exports.assignScoreCriminal = async (caseItem) => {
-    /*
-        CRIMINAL CASE
-            Preference Order
-            * 0. IPC Act
-            * 1. Date of registration
-            * 2. Severity Analysis Score
-            * 3. Number of hearing
-            * 4. Evidence (Value score ->kuch Particular value assign krna hai isko ?)
-            * 5. IsFinal Hearing
-    */
-
-    // 0. IPC Act - done
-    const ipcActScore = getIpcSectionScore(caseItem);
-
-    // 1. Date of registration - done
-    const dateScore = getDateScore(caseItem.caseInfo.regDate);
-
-    // 2. Severity Analysis Score
-    const severityScore = getSeverityScore(caseItem);
-
-    // 3. Number of hearing - done
-    const hearingCountScore = getHearingCountScore(caseItem);
-
-    // 4. Evidence (Value score ->kuch Particular value assign krna hai isko ?)
-    const evidencesScore = getEvidenceScore(caseItem);
-
-    // 5. IsFinal Hearing - done
-    const finalArgumentScore = getFinalArgumentScore(caseItem);
-
-    // Total score
-    const totalScore = ipcActScore + dateScore + severityScore + hearingCountScore + evidencesScore + finalArgumentScore;
-
-    const result = RegisteredCase.findByIdAndUpdate(caseItem._id, {
-        score: totalScore,
-    }, {new: true}).exec();
-
-    return result;
-
-}
 
 const getIpcSectionScore = (caseItem) => {
 

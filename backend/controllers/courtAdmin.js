@@ -3,7 +3,7 @@ const uniqid = require('uniqid')
 const User = require('../models/User');
 const FiledCase = require('../models/FiledCase');
 const RegisteredCase = require('../models/RegisteredCase');
-const {stateMap} = require('../constants/index');
+const {stateMap, trackMap} = require('../constants/index');
 const Court = require('../models/Court');
 
 
@@ -16,8 +16,19 @@ exports.getAllFiledCases = async (req, res) => {
 
 // read one
 exports.getFiledCase = async (req, res) => {
-    
+    try {
+        const caseId = req.params.caseId;
+        // console.log(caseId);
 
+        const result = await FiledCase.findById(caseId).exec();
+
+        res.status(200).json(result);
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json("Internal server error!");
+    }
+    
 }
 
 // create
@@ -30,7 +41,11 @@ exports.fileCase = async (req, res) => {
 
         const state = court ? court.location.state : 'Uttar Pradesh';
 
-        const date = new Date(filingDateAndTime);
+        
+
+        const date = new Date(filingDate);
+
+
 
         // TODO --
         const districtCode = stateMap.get(state);
@@ -39,13 +54,21 @@ exports.fileCase = async (req, res) => {
         const caseFilingNum = uniqid();
         const yearOfCaseFiling = date.getFullYear();
 
-        let filingNum = 'RCC' + '/' + caseFilingNum + '/' + yearOfCaseFiling
-        let cnrNum = districtCode + establishmentCode + '-' + caseFilingNum + '-' + yearOfCaseFiling;
+        const digit_8_randomNumber = Math.floor(Math.random() * 90000000) + 10000000;
+        const digit_5_randomNumber = Math.floor(Math.random() * 90000) + 10000;
+
+        // let filingNum = 'RCC' + '/' + caseFilingNum + '/' + yearOfCaseFiling
+        // let cnrNum = districtCode + '09' + establishmentCode + '-' + caseFilingNum + '-' + yearOfCaseFiling;
+        let filingNum = digit_5_randomNumber + '/' + yearOfCaseFiling
+        let cnrNum = districtCode + '09' + digit_8_randomNumber + yearOfCaseFiling;
 
         const response = await FiledCase.create({
             category, caseType, plaintiffDetails, defendantDetails, valuation, amount, filingDate, filingTime, prayer, reliefClaimed, causeOfAction, act1, actSection1, causeOfActionDate, filingNum, cnrNum
         });
-        res.status(200).json(response);
+        res.status(200).json({
+            'filingNumber': response.filingNum,
+            'cnrNumber': cnrNum
+        });
     } catch (error) {
         console.log(error);
         res.status(500).json("Internal server error!")
@@ -82,7 +105,7 @@ exports.removeFiledCase = async (req, res) => {
 
 exports.registerCase = async (req, res) => {
     try {
-        const {petitioner, respondent, extraInfo, actSection, policeStation, extraParty, caseDetails, registration, caseInfo, courtId} = req.body;
+        const {filingNum, petitioner, respondent, extraInfo, actSection, policeStation, extraParty, caseDetails, registration, caseInfo, caseStatus, caseHearing, courtId, score, finalArgument, evidence, category} = req.body;
         const date = new Date();
         // const caseHistory = [
         //     {
@@ -91,9 +114,14 @@ exports.registerCase = async (req, res) => {
         //         court: courtId,
         //     }
         // ]
+
+        const filedCase = await FiledCase.find()
+
+        const track = trackMap.get(caseInfo.caseType);
+
         const response = await RegisteredCase.create({
             petitioner, respondent, extraInfo, actSection, policeStation, extraParty, caseDetails, registration, caseInfo, courtId,
-            // caseHistory
+            caseStatus, caseHearing, score, track, finalArgument, evidence, category
         });
         res.status(200).json(response);
     } catch (error) {
