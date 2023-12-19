@@ -10,7 +10,7 @@ const { assignScoreCivil, assignScoreCriminal } = require('../helperFunctions/sc
 // const interval = '0 0 */3 * *'; // every 3 days
 // const interval = '0 */2 * * *';  // every 2 hrs
 // const interval = '*/1 * * * *'; // Schedule interval (every 1 minute);
-const interval = '*/2 * * * * *'; // Schedule interval (every 2 seconds)
+const interval = '*/10 * * * * *'; // Schedule interval (every 10 seconds)
 // const interval = '0 0 * * *'; // Schedule interval (every day at midnight)
 // const interval = '0 0 * * 0'; // Schedule interval (every week on Sunday at midnight)
 
@@ -19,10 +19,7 @@ const interval = '*/2 * * * * *'; // Schedule interval (every 2 seconds)
 exports.getSchedule = async (req, res) => {
 
     try {
-
-
         const { courtId } = req.body;
-
         // await schedulingAlgo(courtId);
 
         const schedule = await Schedule.findOne({
@@ -75,7 +72,7 @@ exports.updateSchedule = async (req, res) => {
 const schedulingAlgo = async (courtId, type) => {
 
     if (type === 'civil') {
-        await scheduleCivilCases(courtId);
+        // await scheduleCivilCases(courtId);
     } else {
         await scheduleCriminalCases(courtId);
     }
@@ -232,17 +229,6 @@ const schedulingAlgo = async (courtId, type) => {
 }
 
 const scheduleCivilCases = async (courtId) => {
-
-    // const notHeardCases = await RegisteredCase.find({
-    //     courtId: courtId, 
-    //     caseStatus: 'not heard',
-    // })
-
-    // const pendingCases = await RegisteredCase.find({
-    //     courtId: courtId, 
-    //     caseStatus: 'pending'
-    // })
-
     const deletedSchedule = await Schedule.findOneAndDelete({
         court: courtId
     }).exec();
@@ -252,10 +238,8 @@ const scheduleCivilCases = async (courtId) => {
         category: 'civil'
     }).exec();
 
-    // Track wise case list
-    // const allTrack1cases = allCases.filter(caseObj => caseObj.track === 1);
-    // const allTrack2cases = allCases.filter(caseObj => caseObj.track === 2);
-    // const allTrack3cases = allCases.filter(caseObj => caseObj.track === 3);
+    // console.log('allCivilCase ->', allCases);
+
 
     let casesToBeScheduled = [];
 
@@ -266,24 +250,20 @@ const scheduleCivilCases = async (courtId) => {
         casesToBeScheduled.push(caseItem);
     }
 
+    if (casesToBeScheduled.length) {
+        casesToBeScheduled.sort((a, b) => b.score - a.score);
+    }
 
-    casesToBeScheduled.sort((a, b) => b.score - a.score);
-
-    console.log(`Sorted civil cases based on scores -> ${casesToBeScheduled}`);
+    // console.log(`Sorted civil cases based on scores -> ${casesToBeScheduled}`);
 
     const schedule = new Schedule({
         cases: [],
         court: courtId,
     })
 
-    // let schedule = {
-    //     cases: [],
-    //     court: courtId,
-    // }
-
     for (const caseItem of casesToBeScheduled) {
         const dateAndTime = assignTimeSlots(schedule);
-        console.log(`${dateAndTime} for caseId -> ${caseItem._id}`);
+        // console.log(`${dateAndTime} for caseId -> ${caseItem._id}`);
         if (dateAndTime) {
             schedule.cases.push({ caseId: caseItem._id, dateAndTime });
         } else {
@@ -293,19 +273,9 @@ const scheduleCivilCases = async (courtId) => {
 
     await schedule.save();
 
-    console.log('schedule civil -> ', schedule);
-
-    // Not heard cases
-    // const notHeardCasesTrack1 = allTrack1cases.filter(caseObj => caseObj.caseStatus === 'not heard');
-    // const notHeardCasesTrack2 = allTrack2cases.filter(caseObj => caseObj.caseStatus === 'not heard');
-    // const notHeardCasesTrack3 = allTrack3cases.filter(caseObj => caseObj.caseStatus === 'not heard');
-
-    // Pending Case
-    // const pendingCaseTrack1 = allTrack1cases.filter(caseObj => caseObj.caseStatus === 'pending');
-    // const pendingCaseTrack2 = allTrack2cases.filter(caseObj => caseObj.caseStatus === 'pending');
-    // const pendingCaseTrack3 = allTrack3cases.filter(caseObj => caseObj.caseStatus === 'pending');
 
 
+    // console.log('schedule civil -> ', schedule);
 
 }
 
@@ -341,7 +311,7 @@ const scheduleCriminalCases = async (courtId) => {
 
     casesToBeScheduled.sort((a, b) => b.score - a.score);
 
-    console.log(`Sorted criminal cases based on scores -> ${casesToBeScheduled}`);
+    // console.log(`Sorted criminal cases based on scores -> ${casesToBeScheduled}`);
 
     const schedule = new Schedule({
         cases: [],
@@ -350,7 +320,7 @@ const scheduleCriminalCases = async (courtId) => {
 
     for (const caseItem of casesToBeScheduled) {
         const dateAndTime = assignTimeSlots(schedule);
-        console.log(`${dateAndTime} for caseId -> ${caseItem._id}`);
+        // console.log(`${dateAndTime} for caseId -> ${caseItem._id}`);
         if (dateAndTime) {
             schedule.cases.push({ caseId: caseItem._id, dateAndTime });
         } else {
@@ -360,7 +330,7 @@ const scheduleCriminalCases = async (courtId) => {
 
     await schedule.save();
 
-    console.log('schedule criminal -> ', schedule);
+    // console.log('schedule criminal -> ', schedule);
 
 
 }
@@ -458,8 +428,8 @@ const scheduleCases = async (courtId, cases) => {
 
         // Update or create the schedule in the database
         const result = await schedule.save();
-        console.log(`Schedule updated for court ${courtId}.`);
-        console.log('schedule -> ', result);
+        // console.log(`Schedule updated for court ${courtId}.`);
+        // console.log('schedule -> ', result);
 
     } catch (error) {
         console.log(error);
@@ -488,7 +458,7 @@ const assignTimeSlots = (schedule) => {
 
     // console.log(startTime.getUTCDate());
     const localStartTime = startTime.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
-    console.log('localStartTime', localStartTime + '-');
+    // console.log('localStartTime', localStartTime + '-');
     // console.log(startTime);
 
     // Find the last scheduled case
@@ -539,7 +509,7 @@ const createAndUpdateSchedules = async () => {
     }).select('_id');
 
     const criminalCourts = await Court.find({
-        'courtInfo.subCategory' : 'civil'
+        'courtInfo.subCategory' : 'criminal'
     }).select('_id');
 
     for (const court of civilCourts) {
@@ -554,4 +524,7 @@ const createAndUpdateSchedules = async () => {
 }
 
 // Schedule the function to run at the specified interval
-// schedule.scheduleJob(interval, createAndUpdateSchedules);
+schedule.scheduleJob(interval, createAndUpdateSchedules);
+
+
+

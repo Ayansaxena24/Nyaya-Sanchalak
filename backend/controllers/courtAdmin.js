@@ -17,10 +17,12 @@ exports.getAllFiledCases = async (req, res) => {
 // read one
 exports.getFiledCase = async (req, res) => {
     try {
-        const caseId = req.params.caseId;
+        const filingNo = req.params.filingNo;
         // console.log(caseId);
 
-        const result = await FiledCase.findById(caseId).exec();
+        const result = await FiledCase.findById({
+            filingNo: filingNo
+        }).exec();
 
         res.status(200).json(result);
 
@@ -105,23 +107,30 @@ exports.removeFiledCase = async (req, res) => {
 
 exports.registerCase = async (req, res) => {
     try {
-        const {filingNum, petitioner, respondent, extraInfo, actSection, policeStation, extraParty, caseDetails, registration, caseInfo, caseStatus, caseHearing, courtId, score, finalArgument, evidence, category} = req.body;
-        const date = new Date();
-        // const caseHistory = [
-        //     {
-        //         status: 'registered',
-        //         date: date,
-        //         court: courtId,
-        //     }
-        // ]
+        const { petitioner, respondent, extraInfo, actSection, policeStation, extraParty, caseDetails, registration, caseInfo, caseStatus, courtId, finalArgument, evidence, category} = req.body;
+        const regDate = new Date();
+        const caseHearing = [
+            {
+                status: 'not heard',
+                date: regDate,
+                court: courtId,
+            }
+        ]
 
-        const filedCase = await FiledCase.find()
+        const filingDate = new Date(caseInfo.filingDate);
+        
+        const caseNum = Math.floor(Math.random() * 900) + 100;
+        const regNum = caseNum + '' + filingDate.getFullYear();
+
+        caseInfo.caseNum = caseNum;
+        caseInfo.regNum = regNum;
+        caseInfo.regDate = regDate;
 
         const track = trackMap.get(caseInfo.caseType);
 
         const response = await RegisteredCase.create({
-            petitioner, respondent, extraInfo, actSection, policeStation, extraParty, caseDetails, registration, caseInfo, courtId,
-            caseStatus, caseHearing, score, track, finalArgument, evidence, category
+            petitioner, respondent, extraInfo, actSection, policeStation, extraParty, caseDetails, registration, caseInfo,
+            caseStatus, caseHearing, courtId, track, finalArgument, evidence, category
         });
         res.status(200).json(response);
     } catch (error) {
@@ -142,8 +151,10 @@ exports.getRegisteredCase = async (req, res) => {
 
 exports.updateRegisteredCase = async (req, res) => {
     try {
-        const {data, _id} = req.body;
-        const response = await RegisteredCase.findByIdAndUpdate(_id, data, {new: true}).exec();
+        const {caseDesc, _id} = req.body;
+        const response = await RegisteredCase.findByIdAndUpdate(_id, {
+            'caseDetails.info': caseDesc
+        }, {new: true}).exec();
         res.status(200).json(response);
     } catch (error) {
         console.log(error);
