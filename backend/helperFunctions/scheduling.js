@@ -110,12 +110,12 @@ exports.assignScoreCriminal = async (caseItem) => {
     }, {new: true}).exec();
 
     return result;
-
+   
 }
 
 
 
-// Civil case functions
+// Civil case functions     
 
 const getTrackScore = (track) => {
     switch (track) {

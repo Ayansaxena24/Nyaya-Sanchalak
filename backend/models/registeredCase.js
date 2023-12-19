@@ -351,7 +351,6 @@ const registeredCaseSchema = new mongoose.Schema({
     finalArgument: {
         type: Boolean,
         default: false,
-    }
     },
 
     evidence: [

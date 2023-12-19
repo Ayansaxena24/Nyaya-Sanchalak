@@ -10,6 +10,6 @@ const { handleRefreshToken, handleRegister, handleLogin, handleLogout } = requir
 router.post('/register', handleRegister);
 router.post('/login', handleLogin);
 router.get('/logout', handleLogout);
-router.get('/refresh', handleRefreshToken);
+router.get('/refresh', handleRefreshToken);   
 
 module.exports = router;

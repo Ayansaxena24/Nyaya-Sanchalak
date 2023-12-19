@@ -53,8 +53,13 @@ exports.fileCase = async (req, res) => {
         const establishmentCode = 'LL05'
         const caseFilingNum = uniqid();
         const yearOfCaseFiling = date.getFullYear();
+        // Case Number
+        
 
+        const digit_3_caseNumber=Math.floor(Math.random() *900)+100
+        // CNR NUmber
         const digit_8_randomNumber = Math.floor(Math.random() * 90000000) + 10000000;
+        // Filing Number
         const digit_5_randomNumber = Math.floor(Math.random() * 90000) + 10000;
 
         // let filingNum = 'RCC' + '/' + caseFilingNum + '/' + yearOfCaseFiling
