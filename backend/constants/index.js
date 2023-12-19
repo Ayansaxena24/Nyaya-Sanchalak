@@ -39,10 +39,36 @@ const stateMap = new Map([
 ])
 
 //Trial Purpose Only
-const ipcSections = new Map([
+// const ipcSectionMap = new Map([
+//     ["Section 302",100],
+//     ["Section 304",95],
+//     ["Section 420",50],
+//     ["Section 489A",80],
+//     ["Section 34",40],
+//     ["Section 354",35],
+//     ["Section 509",40],
+//     ["Section 138",20],
+//     ["Section 120B",50],
+//     ["Section 307",80],
+//     ["Section 376",70],
+//     ["Section 468",60],
+//     ["Section 471",60],
+//     ["Section 479",50],
+//     ["Section 506",20],
+//     ["Section 500",20],
+//     ["Section 376A",85],
+//     ["Section 323",10],
+//     ["Section 377",50],
+//     ["Section 427",30],
+//     ["Section 394",35],
+//     ["Section 506B",20],
+//     // ["Section 323",10],
+// ])
+
+const ipcSectionMap = new Map([
     ["34", 40],
     ["120A",80],
-    ["120B", 50],
+    ["120B",50],
     ["125",90],
     ["143",85],
     ["146",60],
@@ -73,7 +99,7 @@ const ipcSections = new Map([
     ["304", 95],
     ["376A", 85],
     ["302", 100],
-    ["305",75]
+    ["305",75],
     ["306",40],
     ["323",65],
     ["363",60],
@@ -90,11 +116,8 @@ const ipcSections = new Map([
     ["499",75],
     ["500",80],
     ["510",80],
-    ["POSCO",100]
-    
-    
-    ])
-    
+])
+
 // Track mapping
 const trackMap = new Map([
     ['Matters relating to maintenance', 1],

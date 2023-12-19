@@ -7,9 +7,10 @@ const ROLES_LIST = require('../config/rolesList');
 const { verifyJWT, verifyRoles } = require('../middlewares/auth');
 
 // controllers
-const { fileCase, registerCase, removeFiledCase, removeRegisteredCase, updateFiledCase, updateRegisteredCase } = require('../controllers/courtAdmin');
+const { fileCase, registerCase, removeFiledCase, removeRegisteredCase, updateFiledCase, updateRegisteredCase, getFiledCase } = require('../controllers/courtAdmin');
 
 // File case
+router.get('/court/file-case/:caseId', getFiledCase)
 router.post('/court/file-case', verifyJWT, verifyRoles(9999), fileCase)
 router.put('/court/file-case', verifyJWT, verifyRoles(9999), updateFiledCase)
 router.delete('/court/file-case', verifyJWT, verifyRoles(9999), removeFiledCase);
