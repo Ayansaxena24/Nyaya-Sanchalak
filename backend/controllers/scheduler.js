@@ -9,8 +9,8 @@ const { assignScoreCivil, assignScoreCriminal } = require('../helperFunctions/sc
 
 // const interval = '0 0 */3 * *'; // every 3 days
 // const interval = '0 */2 * * *';  // every 2 hrs
-// const interval = '*/1 * * * *'; // Schedule interval (every 1 minute);
-const interval = '*/10 * * * * *'; // Schedule interval (every 10 seconds)
+const interval = '*/1 * * * *'; // Schedule interval (every 1 minute);
+// const interval = '*/10 * * * * *'; // Schedule interval (every 10 seconds)
 // const interval = '0 0 * * *'; // Schedule interval (every day at midnight)
 // const interval = '0 0 * * 0'; // Schedule interval (every week on Sunday at midnight)
 
@@ -72,159 +72,10 @@ exports.updateSchedule = async (req, res) => {
 const schedulingAlgo = async (courtId, type) => {
 
     if (type === 'civil') {
-        // await scheduleCivilCases(courtId);
+        await scheduleCivilCases(courtId);
     } else {
         await scheduleCriminalCases(courtId);
     }
-
-
-    // try {
-
-    //     let existingSchedule = await Schedule.findOne({
-    //         court: courtId
-    //     }).exec();
-
-    //     if (!existingSchedule) {
-    //         existingSchedule = await Schedule.create({
-    //             cases: [],
-    //             court: courtId,
-    //         });
-    //     }
-
-    //     // Fetching not heard cases
-    //     let notHeardCases = await RegisteredCase.find({
-    //         courtId,
-    //         caseStatus: 'not heard',
-    //     }).exec();
-
-    //     // Fetching pending cases which has final argument
-    //     let finalArgementCases = await RegisteredCase.find({
-    //         courtId,
-    //         caseStatus: 'pending',
-    //         finalArgement: true,
-    //     }).exec();
-
-    //     // Fetching pending cases which has not final argument
-    //     let pendingCases = await RegisteredCase.find({
-    //         courtId,
-    //         caseStatus: 'pending',
-    //         finalArgement: false,
-    //     }).exec();
-
-
-
-    //     // Finding first 20 cases (fixed)
-    //     // let fixedCases = [];
-    //     // for (let i = 0; i < existingSchedule.cases.length && i < fixingFactor; i++) {
-    //     //     fixedCases.push(existingSchedule.cases[i]);
-    //     // }
-
-
-
-
-
-
-
-    //     // TODO - problem in not fixed cases
-
-    //     // Finding non fixed cases - (these are ready to re-schedule)
-    //     // let notFixedCases = pendingCases.filter(pendingCase => {
-    //     //     // Check if there is no matching caseId in the fixedCases array
-    //     //     return !fixedCases.some(fixedCase => fixedCase.caseId === pendingCase._id);
-    //     // });
-
-    //     // console.log('Not fixed cases -> ', notFixedCases);
-    //     // console.log('fixed cases -> ', fixedCases);
-
-
-
-
-
-
-
-
-    //     // Assigining score to not heard cases
-    //     notHeardCases = await assignScore(notHeardCases);
-
-    //     // Re-assigining score to pending cases
-    //     pendingCases = await reAssiginingScore(pendingCases);
-
-    //     // Track wise case list
-    //     const track1cases = pendingCases.filter(caseObj => caseObj.track === 1);
-    //     const track2cases = pendingCases.filter(caseObj => caseObj.track === 2);
-    //     const track3cases = pendingCases.filter(caseObj => caseObj.track === 3);
-
-
-
-
-
-
-
-
-
-
-
-    //     // 1. Make a single list of nonFixedCases & notHeardCases
-    //     // const casesToBeScheduled = [...pendingCases, ...notHeardCases];
-
-    //     // 2. Sort this list on the basis of score
-    //     // casesToBeScheduled.sort((a, b) => b.score - a.score);
-
-    //     // // 3. From the schedule remove all the cases other than first 20
-    //     // existingSchedule = await Schedule.findByIdAndUpdate(existingSchedule._id, {
-    //     //     cases: fixedCases
-    //     // });
-
-    //     // 3. Remove previous schedule
-    //     // const removedExistingSchedule = await Schedule.findOneAndUpdate({court: courtId}, {
-    //     //     cases: [],
-    //     // }).exec();
-
-    //     // console.log("removed ->> ", removedExistingSchedule);
-
-    //     // 4. Assign slots to these sorted cases (casesToBeScheduled).
-    //     // for (const caseItem of casesToBeScheduled) {
-    //     //     const dateAndTime = assignTimeSlots(existingSchedule);
-
-    //     //     if (dateAndTime) {
-    //     //         existingSchedule.cases.push({ caseId: caseItem._id, dateAndTime });
-    //     //     } else {
-    //     //         console.log(`Could not schedule case ${caseItem._id}. No available slots.`);
-    //     //     }
-    //     // }
-
-
-    //     // 5. Save these sorted cases slots to Schedule.
-    //     // Update or create the schedule in the database
-    //     // const result = await Schedule.findByIdAndUpdate(existingSchedule._id, {
-    //     //     cases: existingSchedule.cases
-    //     // })
-    //     // console.log(`Schedule updated for court ${courtId}.`);
-    //     // console.log('schedule -> ', existingSchedule);
-
-
-
-
-
-
-    //     // // Fetching all registered & pending cases
-    //     // const cases = await RegisteredCase.find({
-    //     //     courtId,
-    //     //     // caseStatus: 'pending',
-    //     //     caseStatus: { $in: ['pending', 'registered'] }
-    //     // }).exec();
-
-    //     // if (cases.length <= 0) {
-    //     //     console.log('No cases found for scheduling.');
-    //     //     return;
-    //     // }
-
-    //     // await assignScore(cases);
-    //     // await scheduleCases(courtId, cases);
-
-    // } catch (error) {
-    //     console.log(error);
-    // }
 
 }
 
@@ -237,9 +88,6 @@ const scheduleCivilCases = async (courtId) => {
         courtId,
         category: 'civil'
     }).exec();
-
-    // console.log('allCivilCase ->', allCases);
-
 
     let casesToBeScheduled = [];
 
@@ -254,8 +102,6 @@ const scheduleCivilCases = async (courtId) => {
         casesToBeScheduled.sort((a, b) => b.score - a.score);
     }
 
-    // console.log(`Sorted civil cases based on scores -> ${casesToBeScheduled}`);
-
     const schedule = new Schedule({
         cases: [],
         court: courtId,
@@ -263,7 +109,6 @@ const scheduleCivilCases = async (courtId) => {
 
     for (const caseItem of casesToBeScheduled) {
         const dateAndTime = assignTimeSlots(schedule);
-        // console.log(`${dateAndTime} for caseId -> ${caseItem._id}`);
         if (dateAndTime) {
             schedule.cases.push({ caseId: caseItem._id, dateAndTime });
         } else {
@@ -273,23 +118,9 @@ const scheduleCivilCases = async (courtId) => {
 
     await schedule.save();
 
-
-
-    // console.log('schedule civil -> ', schedule);
-
 }
 
 const scheduleCriminalCases = async (courtId) => {
-
-    // const pendingCriminalCases = await RegisteredCase.find({
-    //     courtId: courtId,
-    //     caseStaus: 'pending'
-    // })
-
-    // const newCriminalCases = await RegisteredCase.find({
-    //     courtId: courtId,
-    //     caseStaus: 'not heard'
-    // })
 
     const deletedSchedule = await Schedule.findOneAndDelete({
         court: courtId
@@ -311,8 +142,6 @@ const scheduleCriminalCases = async (courtId) => {
 
     casesToBeScheduled.sort((a, b) => b.score - a.score);
 
-    // console.log(`Sorted criminal cases based on scores -> ${casesToBeScheduled}`);
-
     const schedule = new Schedule({
         cases: [],
         court: courtId,
@@ -320,7 +149,6 @@ const scheduleCriminalCases = async (courtId) => {
 
     for (const caseItem of casesToBeScheduled) {
         const dateAndTime = assignTimeSlots(schedule);
-        // console.log(`${dateAndTime} for caseId -> ${caseItem._id}`);
         if (dateAndTime) {
             schedule.cases.push({ caseId: caseItem._id, dateAndTime });
         } else {
@@ -328,10 +156,9 @@ const scheduleCriminalCases = async (courtId) => {
         }
     }
 
+    
+
     await schedule.save();
-
-    // console.log('schedule criminal -> ', schedule);
-
 
 }
 
@@ -455,6 +282,12 @@ const assignTimeSlots = (schedule) => {
     // Calculate the start time for scheduling three days before the current date
     const today = new Date();
     const startTime = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 3, startTimeRange, 0, 0);
+
+    if (startTime.getDay() === 0) { // Sunday
+        // Adjust the start time to the next available day (Monday)
+        startTime.setDate(startTime.getDate() + 1);
+        startTime.setHours(startTimeRange);
+    }
 
     // console.log(startTime.getUTCDate());
     const localStartTime = startTime.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });

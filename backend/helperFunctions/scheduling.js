@@ -3,7 +3,7 @@ const RegisteredCase = require("../models/RegisteredCase");
 const constFactor = 5;
 // const finalArgementConstFactor = 10;
 
-const { trackMap, ipcSectionMap, caseStageMap } = require('../constants/index');
+const { trackMap, ipcSectionMap, caseStageMap, potentialPunishmentMap } = require('../constants/index');
 
 exports.assignScoreCivil = async (caseItem) => {
     /*
@@ -13,8 +13,6 @@ exports.assignScoreCivil = async (caseItem) => {
         * 3. Stage of case
         * 4. Evidences
         * 5. Number of Hearing
-        * 6. Valuation
-        * 7. Anupam's score
     */
 
     // 1. Track - done
@@ -32,12 +30,6 @@ exports.assignScoreCivil = async (caseItem) => {
 
     // 5. Number of Hearing
     const hearingCountScore = getHearingCountScore(caseItem);
-   
-    // 6. Valuation
-    const valuationScore = getValuationScore(caseItem);
-
-    // 7. Anupam's score
-    const anupamScore = getAnupamScore(caseItem);
 
     // console.log('trackScore ->',trackScore);
     // console.log('dateScore->',dateScore);
@@ -48,7 +40,7 @@ exports.assignScoreCivil = async (caseItem) => {
     // console.log('anupamScore->',anupamScore);
 
     // Total score
-    const totalScore = 4*trackScore + 3*dateScore + 5*evidencesScore + 5*hearingCountScore + 5*valuationScore + 10*caseStageScore + 5*anupamScore;
+    const totalScore = 40*trackScore + 30*dateScore + 5*evidencesScore + 10*hearingCountScore  + 10*caseStageScore +0
     /* reliefScore + injuctionSore +  valuation + amendemant + disputeScore + */
 
     // console.log(`total civil score for ${caseItem._id} is ${totalScore}`);
@@ -89,11 +81,11 @@ exports.assignScoreCriminal = async (caseItem) => {
     // 5. Case Stage Hearing - done
     const caseStageScore = getCaseStageScore(caseItem);
 
-    // console.log('ipcActScore->', ipcActScore);
-    // console.log('dateScore->', dateScore);
-    // console.log('severityScore->', severityScore);
-    // console.log('hearingCountScore->', hearingCountScore);
-    // console.log('caseStageScore->', caseStageScore);
+    console.log('ipcActScore->', ipcActScore);
+    console.log('dateScore->', dateScore);
+    console.log('severityScore->', severityScore);
+    console.log('hearingCountScore->', hearingCountScore);
+    console.log('caseStageScore->', caseStageScore);
 
     // Total score
     const totalScore = 35*ipcActScore + 30*dateScore + 17*severityScore + 10*hearingCountScore + 8*caseStageScore;
@@ -165,9 +157,9 @@ const getValuationScore = (caseItem) => {
 //     return 0;
 // }
 
-const getAnupamScore = () => {
-    return 0;
-}
+// const getAnupamScore = () => {
+//     return 0;
+// }
 
 
 
@@ -208,6 +200,31 @@ const getIpcSectionScore = (caseItem) => {
 }
 
 const getSeverityScore = (caseItem) => {
+
+    // const actSection = caseItem.actSection;
+
+    // const punishmentArray = [];
+    // const sectionArray = [];
+
+    // for (let item of actSection) {
+    //     const section = item.section;
+
+    //     sectionArray.push(section);
+    //     punishmentArray.push("IPC " + potentialPunishmentMap.get(section));
+    // }
+
+    // const response = fetch('http://localhost:5000/predict-criminal', {
+    //     method: 'POST',
+    //     body: {
+    //         caseType: caseItem.caseInfo.caseType,
+    //         caseDesc: caseItem.caseDetails.info,
+    //         potentialPunishment: punishmentArray,
+    //         applicableActs: sectionArray
+    //     }
+    // })
+
+    // console.log(response);
+
     return 0;
 }
 

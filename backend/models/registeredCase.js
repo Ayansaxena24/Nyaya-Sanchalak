@@ -315,32 +315,32 @@ const registeredCaseSchema = new mongoose.Schema({
 
     caseHearing: [
         {
-            typeOfEvd: String,
+            // typeOfEvd: String,
             date: Date,
             court: {
                 type: ObjectId,
                 ref: 'Court',
             },
-            score: {
-                type: Number,
-                default: 0,
-            },
+            // score: {
+            //     type: Number,
+            //     default: 0,
+            // },
 
-            caseDescription: {
-                facts: [],
-                evidence: [
-                    {
-                        typeOfEvd: String,
-                        description: String,
-                    }
-                ],
-                actSection: [
-                    {
-                        act: String,
-                        section: String,
-                    }
-                ],
-            }
+            // caseDescription: {
+            //     facts: [],
+            //     evidence: [
+            //         {
+            //             typeOfEvd: String,
+            //             description: String,
+            //         }
+            //     ],
+            //     actSection: [
+            //         {
+            //             act: String,
+            //             section: String,
+            //         }
+            //     ],
+            // }
         }
     ],
 
@@ -355,7 +355,7 @@ const registeredCaseSchema = new mongoose.Schema({
     
     track: {
         type: Number,
-        required: [true, "Track is required!"],
+        // required: [true, "Track is required!"],
     }, 
     finalArgument: {
         type: Boolean,

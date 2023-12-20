@@ -10,5 +10,6 @@ const { getSchedule, removeSchedule } = require('../controllers/scheduler');
 
 router.post('/schedule', verifyJWT, getSchedule);
 router.delete('/schedule', verifyJWT, removeSchedule);
+router.put('/schedule')
 
 module.exports = router;

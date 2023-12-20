@@ -170,7 +170,45 @@ const caseStageMap = new Map([
     ['Judgment', 100]
 ])
 
-module.exports = {stateMap, ipcSectionMap, trackMap, caseStageMap}
+
+const potentialPunishmentMap = new Map([
+    { "IPC Section 120A": "Imprisonment for up to 7 years, or fine, or both" },
+    { "IPC Section 121A": "Imprisonment for life, or death penalty" },
+    { "IPC Section 143": "Imprisonment for up to 3 years, or fine, or both" },
+    { "IPC Section 146": "Imprisonment for up to 10 years, or fine, or both" },
+    { "IPC Section 147": "Imprisonment for up to 7 years, or fine, or both" },
+    { "IPC Section 148": "Imprisonment for life, or death penalty" },
+    { "IPC Section 153A": "Imprisonment for up to 5 years, or fine, or both" },
+    { "IPC Section 160": "Imprisonment for up to 6 months, or fine, or both" },
+    { "IPC Section 161": "Imprisonment for up to 1 month, or fine, or both" },
+    { "IPC Section 182": "Imprisonment for up to 7 years, or fine, or both" },
+    { "IPC Section 186": "Imprisonment for up to 7 years, or fine, or both" },
+    { "IPC Section 191": "Imprisonment for up to 7 years, or fine, or both" },
+    { "IPC Section 192": "Imprisonment for up to 7 years, or fine, or both" },
+    { "IPC Section 193": "Imprisonment for up to 7 years, or fine, or both" },
+    { "IPC Section 195": "Imprisonment for life" },
+    { "IPC Section 199": "Imprisonment for up to 7 years, or fine, or both" },
+    { "IPC Section 272": "Imprisonment for up to 7 years, or fine, or both" },
+    { "IPC Section 290": "Imprisonment for up to 3 months, or fine, or both" },
+    { "IPC Section 294": "Imprisonment for up to 3 years, or fine, or both" },
+    { "IPC Section 294A": "Imprisonment for up to 3 months, or fine, or both" },
+    { "IPC Section 295": "Imprisonment for up to 2 years, or fine, or both" },
+    { "IPC Section 304": "Imprisonment for up to 10 years, or fine, or both" },
+    { "IPC Section 304A": "Imprisonment for up to 2 years, or fine, or both" },
+    { "IPC Section 304B": "Imprisonment for life, or death penalty" },
+    { "IPC Section 305": "Imprisonment for up to 10 years, or fine, or both" },
+    { "IPC Section 306": "Imprisonment for up to 10 years, or fine, or both" },
+    { "IPC Section 323": "Imprisonment for up to 3 years, or fine, or both" },
+    { "IPC Section 325": "Imprisonment for up to 10 years, or fine, or both" },
+    { "IPC Section 351": "Imprisonment for up to 6 months, or fine, or both" },
+    { "IPC Section 354A": "Imprisonment for up to 3 years, or fine, or both" },
+    { "IPC Section 354C": "Imprisonment for up to 3 years, or fine, or both" },
+    { "IPC Section 354D": "Imprisonment for up to 3 years, or fine, or both" },
+    { "IPC Section 363": "Imprisonment for up to 7 years, or fine, or both" },
+    { "IPC Section 365": "Imprisonment for up to 7 years, or fine"}
+])
+
+module.exports = {stateMap, ipcSectionMap, trackMap, caseStageMap, potentialPunishmentMap}
 
 
 
