@@ -2,6 +2,8 @@ import React from "react";
 import { useRef, useState, useEffect } from "react";
 import useAuth from "../../hooks/useAuth";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import logo from "../../assets/Images/ministryLogo.jpg";
 import { BsFillTriangleFill } from "react-icons/bs";
 import LoginLogo from "../../assets/Images/Login/LoginLogo.png";
@@ -10,6 +12,7 @@ import staff from "../../assets/Images/Login/staff.png";
 import Ellipse1 from "../../assets/Images/Login/Ellipse1.png";
 import Ellipse2 from "../../assets/Images/Login/Ellipse2.png";
 import Ellipse3 from "../../assets/Images/Login/Ellipse3.png";
+import { userSignInAction } from "../../redux/actions/userAction";
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -42,6 +45,23 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [errMsg, setErrMsg] = useState("");
   const notify = () => toast(errMsg);
+
+    const [user, setUser] = useState('');
+    const [pwd, setPwd] = useState('');
+    const dispatch = useDispatch();
+
+    const { isAuthenticated, userInfo } = useSelector(state => state.signIn);
+
+  useEffect(() => { // redirect to dashboard if user is authenticated
+    if (isAuthenticated) {
+        if (userInfo.role === 8888) {
+            navigate('/admin/caseregistration');
+        } else {
+            navigate('/admin/casefiling');
+        }
+    }
+}, [isAuthenticated])
+
     
 
   useEffect(() => {
@@ -53,47 +73,88 @@ const Login = () => {
     setErrMsg("");
   }, [jobId, password]);
 
-  const handleSubmit = async (e) => {
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+
+  //   try {
+  //     const response = await axios.post(
+  //       LOGIN_URL,
+  //       JSON.stringify({ jobId, password }),
+  //       {
+  //         headers: { "Content-Type": "application/json" },
+  //         withCredentials: true,
+  //       }
+  //     );
+  //     console.log(JSON.stringify(response?.data));
+  //     //console.log(JSON.stringify(response));
+  //     const accessToken = response?.data?.accessToken;
+  //     const roles = response?.data?.roles;
+  //     setAuth({ jobId, password, roles, accessToken });
+  //     console.log("should be called navigate");
+  //     setUser("");
+  //     setPwd("");
+  //     // navigate(from, { replace: true });
+  //     // errMsg === "" ? setErrMsg("Logged In Successfully") : "";
+  //     navigate('/')
+      
+  //   } catch (err) {
+  //     if (!err?.response) {
+  //       setErrMsg("Logged In Successfully");
+  //       toast.success("Logged In Successfully");
+  //     } else if (err.response?.status === 400) {
+  //       setErrMsg("Missing Username or Password");
+  //       toast.error("Missing Username or Password");
+  //     } else if (err.response?.status === 401) {
+  //       setErrMsg("Unauthorized");
+  //       toast.error("Unauthorized");
+  //     } else {
+  //       setErrMsg("Login Failed");
+  //       toast.error("Login Failed");
+  //     }
+  //     // errRef.current.focus();
+  //   }
+  // };
+
+  const handleSubmit = async (e, values, actions) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post(
-        LOGIN_URL,
-        JSON.stringify({ jobId, password }),
-        {
-          headers: { "Content-Type": "application/json" },
-          withCredentials: true,
-        }
-      );
-      console.log(JSON.stringify(response?.data));
-      //console.log(JSON.stringify(response));
-      const accessToken = response?.data?.accessToken;
-      const roles = response?.data?.roles;
-      setAuth({ jobId, password, roles, accessToken });
-      console.log("should be called navigate");
-      setUser("");
-      setPwd("");
-      // navigate(from, { replace: true });
-      // errMsg === "" ? setErrMsg("Logged In Successfully") : "";
-      navigate('/')
-      
+      // const response = await axios.post(
+      //         LOGIN_URL,
+      //         JSON.stringify({ jobId, password }),
+      //         {
+      //           headers: { "Content-Type": "application/json" },
+      //           withCredentials: true,
+      //         }
+      //       );
+      const response = await dispatch(userSignInAction({jobId, password})); // dispatch action and get the response
+        console.log(JSON.stringify(response?.data));
+        // dispatch(userSignInAction({jobId, password})); // dispatch action
+        console.log({jobId, password});
+        actions.resetForm(); // reset form after submit
+
+        
+        //console.log(JSON.stringify(response));
+        const accessToken = response?.data?.accessToken;
+        const roles = response?.data?.roles;
+        // setAuth({ user, pwd, roles, accessToken });
+        setUser('');
+        setPwd('');
+
+        
     } catch (err) {
-      if (!err?.response) {
-        setErrMsg("Logged In Successfully");
-        toast.success("Logged In Successfully");
-      } else if (err.response?.status === 400) {
-        setErrMsg("Missing Username or Password");
-        toast.error("Missing Username or Password");
-      } else if (err.response?.status === 401) {
-        setErrMsg("Unauthorized");
-        toast.error("Unauthorized");
-      } else {
-        setErrMsg("Login Failed");
-        toast.error("Login Failed");
-      }
-      // errRef.current.focus();
+        if (!err?.response) {
+            setErrMsg('No Server Response');
+        } else if (err.response?.status === 400) {
+            setErrMsg('Missing Username or Password');
+        } else if (err.response?.status === 401) {
+            setErrMsg('Unauthorized');
+        } else {
+            setErrMsg('Login Failed');
+        }
+        errRef.current.focus();
     }
-  };
+}
 
   return (
     <div className="h-[100vh] flex justify-start items-start bg-white">

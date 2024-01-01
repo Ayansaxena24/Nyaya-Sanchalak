@@ -80,12 +80,12 @@ const Register = () => {
         },
         court,
       };
-      if (role === "9999") {
+      if (role === "8888") {
         // roleName = "Judge";
         data.roles = {
           'Judge': role,
         };
-      } else if (role === "8888") {
+      } else if (role === "9999") {
         // roleName = "CourtAdmin";
         data.roles = {
           'CourtAdmin': role,
@@ -252,8 +252,8 @@ const Register = () => {
                 value={role}
                 required
               >
-                <option value="9999">Judge</option>
-                <option value="8888">Court Admin</option>
+                <option value="8888">Judge</option>
+                <option value="9999">Court Admin</option>
               </select>
             </div>
             <div className="flex flex-col w-full space-y-2">
