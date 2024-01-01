@@ -24,8 +24,7 @@ const scheduleSchema = new mongoose.Schema({
     court: {
         type: ObjectId,
         ref: 'Court',
-        required: [true, "court _id is required!"],
-        unique: [true, "court_id should be unique!"]
+        required: [true, "court _id is required!"]
     }
 }, {timestamps: true});
 

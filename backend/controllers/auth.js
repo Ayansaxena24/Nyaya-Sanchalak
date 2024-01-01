@@ -14,12 +14,14 @@ const bcrypt = require('bcrypt');
 // };
 
 exports.handleRegister = async (req, res) => {
+    console.log(req.body);
     const { jobId, name, password, roles, court } = req.body;
     if (!jobId || !name || !password) return res.status(400).json({ 'message': 'JobID, name and password are required.' });
 
+
     // check for duplicate usernames in the db
     const duplicate = await User.findOne({ jobId: jobId }).exec();
-    if (duplicate) return res.sendStatus(409).json({'message':"User Already Exists"})
+    if (duplicate) return res.sendStatus(409); //Conflict 
 
     try {
         //encrypt the password
@@ -82,7 +84,7 @@ exports.handleLogin = async (req, res) => {
         // res.cookie('jwt', refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
 
         // Send authorization roles and access token to user
-        res.json({ roles, accessToken, user: foundUser });
+        res.json({ roles, accessToken });
 
     } else {
         res.sendStatus(401);
