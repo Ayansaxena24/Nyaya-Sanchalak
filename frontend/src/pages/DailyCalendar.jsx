@@ -85,7 +85,7 @@ const DailyCalendar = () => {
   };
 
 
-  const token = userInfo.accessToken;
+  const token = userInfo?.accessToken;
   const openSidebar = (caseItem) => {
     setSelectedCase(caseItem);
   };
