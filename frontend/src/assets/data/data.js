@@ -213,6 +213,7 @@ export const scheduleData = [
       petitionerAdvocate: "Jane Smith",
       respondent: "Alice Johnson",
       respondentAdvocate: "Bob Williams",
+      scheduledDate: "2022-12-01", 
     },
     {
       srNo: 2,
@@ -231,6 +232,8 @@ export const scheduleData = [
       petitionerAdvocate: "Michael Brown",
       respondent: "David Smith",
       respondentAdvocate: "Jennifer Davis",
+      scheduledDate: "2022-12-01", 
+
     },
     {
       srNo: 3,
@@ -249,6 +252,8 @@ export const scheduleData = [
       petitionerAdvocate: "Laura White",
       respondent: "Emily Davis",
       respondentAdvocate: "Christopher Wilson",
+      scheduledDate: "2022-12-02", 
+
     },
     {
       srNo: 4,
@@ -267,6 +272,8 @@ export const scheduleData = [
       petitionerAdvocate: "William Harris",
       respondent: "Sophia Garcia",
       respondentAdvocate: "Daniel Martin",
+      scheduledDate: "2022-12-02", 
+
     },
     {
       srNo: 5,
@@ -285,6 +292,8 @@ export const scheduleData = [
       petitionerAdvocate: "Ava Robinson",
       respondent: "Mia Thompson",
       respondentAdvocate: "James Allen",
+      scheduledDate: "2022-12-03", 
+
     },
     {
       srNo: 6,
@@ -303,6 +312,8 @@ export const scheduleData = [
       petitionerAdvocate: "Grace Moore",
       respondent: "Chloe Turner",
       respondentAdvocate: "Joseph Reed",
+      scheduledDate: "2022-12-03", 
+
     },
     {
       srNo: 7,
@@ -321,6 +332,8 @@ export const scheduleData = [
       petitionerAdvocate: "Natalie Turner",
       respondent: "Sofia Davis",
       respondentAdvocate: "Liam Martinez",
+      scheduledDate: "2022-12-03", 
+
     },
     {
       srNo: 8,
@@ -339,6 +352,8 @@ export const scheduleData = [
       petitionerAdvocate: "Ethan Johnson",
       respondent: "Liam Martinez",
       respondentAdvocate: "Natalie Turner",
+      scheduledDate: "2022-12-03", 
+
     },
     {
       srNo: 9,
@@ -357,6 +372,8 @@ export const scheduleData = [
       petitionerAdvocate: "Joseph Reed",
       respondent: "Logan Wilson",
       respondentAdvocate: "Grace Moore",
+      scheduledDate: "2022-12-04", 
+
     },
     {
       srNo: 10,
@@ -375,6 +392,8 @@ export const scheduleData = [
       petitionerAdvocate: "Sofia Davis",
       respondent: "Natalie Turner",
       respondentAdvocate: "Liam Martinez",
+      scheduledDate: "2022-12-04", 
+
     },
   ];
   

@@ -26,7 +26,6 @@ import user from "../assets/Images/user.png";
 import judge3 from "../assets/Images/judge3.png";
 import editIcon1 from "../assets/Images/editIcon.png";
 import axios from "./api/axios";
-import { format } from "date-fns";
 
 const DailyCalendar = () => {
   const [selectedCase, setSelectedCase] = useState(null);
@@ -47,43 +46,6 @@ const DailyCalendar = () => {
       Navigate("/");
     }, 500);
   };
-
-  const handleUpdateDesc = async (e) => {
-    e.preventDefault();
-    try {
-      // Make a PUT request to update the case description
-      const updatedCase = {
-        ...selectedCase,
-        caseDescription: editedCaseDescription,
-      };
-      // Add your server endpoint URL
-      const apiUrl = "https://your-api-endpoint.com/update-case-description";
-      await axios.put(apiUrl, updatedCase);
-      // Close the sidebar after successful update
-      endEditMode();
-      onClose();
-    } catch (error) {
-      console.error("Error updating case description:", error);
-      // Handle error, show a message, etc.
-    }
-  };
-
-  const sendMail = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await axios.post(URL, JSON.stringify(data), {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        withCredentials: true,
-      });
-      console.log("response --> ", response?.data);
-    } catch (error) {
-      console.error("Error sending mail:", error);
-    }
-  };
-
 
   const token = userInfo.accessToken;
   const openSidebar = (caseItem) => {
@@ -120,33 +82,37 @@ const DailyCalendar = () => {
     }
   };
 
-  const [fetchedData, setFetchedData] = useState([]);
-
   useEffect(() => {
     const fetchCases = async () => {
       try {
         const response = await axios.post(
-          "/schedule",
-          JSON.stringify({ courtId: userInfo?.user?.court }),
+          '/schedule',
+          JSON.stringify({courtId : userInfo?.user?.court}),
           {
             headers: {
               Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
+              'Content-Type': 'application/json',
             },
             withCredentials: true,
           }
         );
-
-        setFetchedData(response.data.cases);
+  
+        const fetchedCases = response?.data; 
+        const caseHearingDate = new Date(response?.data)
         // setCaseData(fetchedCases);
         console.log("response --> ", response?.data);
+          
       } catch (error) {
-        console.error("Error fetching cases:", error);
+        console.error('Error fetching cases:', error);
+  
       }
     };
 
+  
     fetchCases();
+  
   }, [userInfo, token]);
+  
 
   console.log(userInfo);
   // Function to cancel the edit mode
@@ -155,137 +121,14 @@ const DailyCalendar = () => {
     endEditMode();
   };
 
-  const [datee, setDatee] = useState(new Date());
 
   return (
     <div className={`h-[100vh] flex justify-start items-start bg-white `}>
       {/* --------------------------------------------------SIDEBAR-------------------------------------------------------------- */}
-      <div className="flex flex-col min-w-[300px] justify-between bg-[#E1EEDD] h-screen pl-4 pr-2 pt-2">
-        <div>
-          <img className="h-12 w-32 font-bold" src={logo}></img>
-          <div className="space-y-2 mt-4">
-            <p className="mt-4 text-gray-400"> MENU </p>
-            <div className="font-semibold space-y-2">
-              <p className="hover:text-green-600 hover:border-green-600 duration-300 ease-in-out">
-                {" "}
-                <Link to="/"> Home </Link>{" "}
-              </p>
-              <p className="hover:text-green-600 hover:border-green-600 duration-300 ease-in-out">
-                {" "}
-                Hearing Schedule{" "}
-              </p>
-              <div className="flex pl-4 hover:text-green-600 hover:border-green-600 duration-300 ease-in-out">
-                <p>--</p>
-                <p className="pl-2">
-                  <Link to="/calendar">View Monthly Schedule </Link>
-                </p>
-              </div>
-              <div className="flex absolute left-8 mt-8 font-semibold text-lg shadow-green-400 shadow-md w-[300px] -ml-8 pl-8">
-                <p>--</p>
-                <p className="pl-2">
-                  <Link to="/dailycalendar"> View Daily Schedule </Link>
-                </p>
-              </div>
-              <p className="hover:text-green-600 hover:border-green-600 duration-300 ease-in-out pt-10">
-                {" "}
-                <Link to="/admin/caseregistration"> Case Registration </Link>
-              </p>
-              <p className="hover:text-green-600 hover:border-green-600 duration-300 ease-in-out">
-                {" "}
-                <Link to="/admin/casefiling"> Case Filing </Link>
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="flex flex-col pb-10 w-full justify-center space-y-4">
-          <div className="flex flex-col justify-center items-center text-center w-full mt-4">
-            {userInfo?.roles[0] === 8888 ? (
-              <img className="h-36 w-36 rounded-full" src={judge3}></img>
-            ) : userInfo?.roles[0] === 9999 ? (
-              <img
-                className="h-36 w-36 rounded-full"
-                src="https://png.pngtree.com/png-clipart/20220726/original/pngtree-internet-search-information-read-hand-book-with-mause-png-image_8409603.png"
-              ></img>
-            ) : (
-              <img className="h-36 w-36 rounded-full" src={user}></img>
-            )}
-            <p>
-              Welcome,{" "}
-              {userInfo?.roles[0] === 8888 ? (
-                <span className="font-bold">Judge</span>
-              ) : userInfo?.roles[0] === 9999 ? (
-                <span className="font-bold">Admin</span>
-              ) : (
-                <span className="font-bold">User</span>
-              )}
-            </p>
-          </div>
-          {userInfo?.roles[0] === 8888 || userInfo?.roles[0] === 9999 ? (
-            <button
-              className="flex rounded-lg justify-center border-2 border-gray-400 px-20 mr-2 font-bold py-2 hover:text-green-600 hover:border-green-600 duration-300 ease-in-out"
-              onClick={logOutUser}
-            >
-              Log Out
-            </button>
-          ) : (
-            <button className="flex rounded-lg justify-center border-2 border-gray-400 px-20 mr-2 font-bold py-2 hover:text-green-600 hover:border-green-600 duration-300 ease-in-out">
-              <Link to="/login"> Log In </Link>
-            </button>
-          )}
-        </div>
-      </div>
 
       {/* ------------------------------------------Content for the Daily Calendar Page-------------------------------------------------- */}
 
       <div className="pt-10 pl-10 w-[1200px] flex flex-col justify-between h-full space-y-8">
-        <div className="flex justify-between w-full">
-          {/* Left Case Info Box */}
-          <div className="flex flex-col border-2 rounded-md min-w-[200px] py-4 px-2">
-            <p className="text-xs text-gray-500"> Total cases</p>
-            <div className="flex justify-between">
-              <p className="font-bold text-xl"> 24 </p>
-              <p className="text-xs flex bg-green-200 text-green-500 font-bold rounded-2xl pt-1 px-3 scale-75">
-                <IoArrowUpSharp className="mt-0.5 mr-1" /> 20%
-              </p>
-            </div>
-          </div>
-
-          <div className="flex space-x-4 ml-20">
-            {/* <label for="Category"></label> */}
-            <select
-              id="Category"
-              placeholder="Category: Case Number"
-              name="Category"
-              className="border-2 rounded-lg pr-12 pl-2 h-fit py-1 text-gray-500"
-            >
-              <option value="australia">Category : Case Number</option>
-              <option value="canada">Canada</option>
-              <option value="usa">USA</option>
-            </select>
-
-            <div className="flex">
-              <IoSearchOutline className="mt-2.5 opacity-20 absolute ml-2" />
-              <input
-                type="text"
-                placeholder="Search"
-                className="border-2 rounded-lg h-fit py-1 pl-7 w-96"
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="flex w-full justify-center">
-            <Link to="/editCases">
-              <div className="flex px-2 space-x-1.5 duration-300 ease-in-out hover:scale-105 bg-[#49AE52] h-fit rounded-lg justify-center items-center text-center">
-                <img src={editIcon1} className="w-[16px] h-[15px]" />
-                <button className="rounded-lg px-0 mr-0 h-fit py-1 text-white">
-                  Edit
-                </button>
-              </div>
-            </Link>
-          </div>
-        </div>
 
         {/* ------------------------------------------Table for the Daily Calendar Page-------------------------------------------------- */}
         <TableContainer className="pb-10">
@@ -303,25 +146,60 @@ const DailyCalendar = () => {
                 <Th>Case Status</Th>
               </Tr>
             </Thead>
-            {searchInput === "" && fetchedData && (
-              <Tbody>
-                {fetchedData.map((caseItem, i) => (
-                  <Tr key={i + 1}>
-                    <Td>{i + 1}</Td>
-                    <Td>{caseItem?.caseId?.caseInfo?.caseType}</Td>
-                    <Td isNumeric>{caseItem?.caseId?.caseInfo?.caseNum}</Td>
-                    <Td isNumeric>{caseItem?.caseId?.caseInfo?.caseYear}</Td>
-
-                    <Td>{format(new Date(caseItem.dateAndTime), "HH:mm")}</Td>
-                    <Td>
-                      {format(new Date(caseItem.dateAndTime), "yyyy-MM-dd")}
-                    </Td>
+            {searchInput === "" && caseData &&
+            <Tbody>
+              {caseData.map((caseItem, i) => (
+                <Tr key={i+1}>
+                  <Td>{i+1}</Td>
+                  <Td>{caseItem?.caseId?.caseInfo?.caseType}</Td>
+                  <Td isNumeric>{caseItem?.caseId?.caseInfo?.caseNum}</Td>
+                  <Td isNumeric>{caseItem?.caseId?.caseInfo?.caseYear}</Td>
+                  <Td>{caseItem.dateAndTime}</Td>
+                  <Td>{caseItem.dateAndTime}</Td>
+                  <Td>
+                    <button
+                      className="px-4 py-1 bg-[#65BEA6] text-white rounded-md duration-300 ease-in-out hover:scale-105 hover:text-green-800"
+                      ref={btnRef}
+                      onClick={() => {
+                        openSidebar(caseItem);
+                        onOpen();
+                      }}
+                    >
+                      View
+                    </button>
+                  </Td>
+                  <Td>
+                    <select>
+                      <option>{caseItem.caseStatus}</option>
+                      <option>Closed</option>
+                    </select>
+                  </Td>
+                </Tr>
+              ))}
+            </Tbody>
+            }
+            {searchInput && caseData &&
+            <Tbody>
+              {searchInput && caseData
+                .filter((caseItem) =>
+                  searchInput
+                    ? String(caseItem.caseNumber).includes(searchInput)
+                    : true
+                )
+                .map((filteredCase, index) => (
+                  <Tr key={index + 1}>
+                    <Td>{filteredCase.srNo}</Td>
+                    <Td>{filteredCase.caseType}</Td>
+                    <Td isNumeric>{filteredCase.caseNumber}</Td>
+                    <Td isNumeric>{filteredCase.caseYear}</Td>
+                    <Td>{filteredCase.hearingSlot}</Td>
+                    <Td>{filteredCase.scheduledDate}</Td>
                     <Td>
                       <button
                         className="px-4 py-1 bg-[#65BEA6] text-white rounded-md duration-300 ease-in-out hover:scale-105 hover:text-green-800"
                         ref={btnRef}
                         onClick={() => {
-                          openSidebar(caseItem);
+                          openSidebar(filteredCase);
                           onOpen();
                         }}
                       >
@@ -330,72 +208,14 @@ const DailyCalendar = () => {
                     </Td>
                     <Td>
                       <select>
-                        <option>{caseItem?.caseId?.caseStatus}</option>
+                        <option>{filteredCase.caseStatus}</option>
                         <option>Closed</option>
                       </select>
                     </Td>
                   </Tr>
                 ))}
-              </Tbody>
-            )}
-            {searchInput && fetchedData && (
-              <Tbody>
-                {searchInput &&
-                  fetchedData
-                    .filter((caseItem) =>
-                      searchInput
-                        ? String(caseItem?.caseId?.caseInfo?.caseNum).includes(
-                            searchInput
-                          )
-                        : true
-                    )
-                    .map((filteredCase, index) => (
-                      <Tr key={index + 1}>
-                        <Td>{index + 1}</Td>
-                        <Td>{filteredCase?.caseId?.caseInfo?.caseType}</Td>
-                        <Td isNumeric>
-                          {filteredCase?.caseId?.caseInfo?.caseNum}
-                        </Td>
-                        <Td isNumeric>
-                          {filteredCase?.caseId?.caseInfo?.caseYear}
-                        </Td>
-                        <Td>
-                          {format(new Date(filteredCase.dateAndTime), "HH:mm")}
-                        </Td>
-                        <Td>
-                          {format(
-                            new Date(filteredCase.dateAndTime),
-                            "yyyy-MM-dd"
-                          )}
-                        </Td>
-                        <Td>
-                          <button
-                            className="px-4 py-1 bg-[#65BEA6] text-white rounded-md duration-300 ease-in-out hover:scale-105 hover:text-green-800"
-                            ref={btnRef}
-                            onClick={() => {
-                              openSidebar(filteredCase);
-                              onOpen();
-                            }}
-                          >
-                            View
-                          </button>
-                        </Td>
-                        <Td>
-                          <select>
-                            <option>{filteredCase.caseStatus}</option>
-                            <option>Closed</option>
-                          </select>
-                        </Td>
-                        <Td>
-                          <select>
-                            <option>{filteredCase.caseStatus}</option>
-                            <option>Closed</option>
-                          </select>
-                        </Td>
-                      </Tr>
-                    ))}
-              </Tbody>
-            )}
+            </Tbody>
+            }
 
             {/* <Tbody
 
@@ -429,7 +249,7 @@ const DailyCalendar = () => {
 
                 {/* case details */}
                 <div className="flex border-2 rounded-lg border-gray-400 p-2 justify-between">
-                  <div className="flex-col w-64">
+                  <div className="flex-col">
                     <p>
                       <span className="font-semibold">Case Type:</span>{" "}
                     </p>
@@ -451,19 +271,13 @@ const DailyCalendar = () => {
                       <span className="font-semibold">CNR Number:</span>{" "}
                     </p>
                   </div>
-                  <div className="flex flex-col">
-                    <p>{selectedCase?.caseId?.caseInfo?.caseType}</p>
-                    <p>
-                      {format(new Date(selectedCase.dateAndTime), "yyyy-MM-dd")}
-                    </p>
-                    <p>{selectedCase?.caseId?.caseInfo?.regNum}</p>
-                    <p>{selectedCase?.caseId?.caseInfo?.cnrNum}</p>
-                    <p>
-                      {format(
-                        new Date(selectedCase?.caseId?.caseInfo?.regDate),
-                        "yyyy-MM-dd"
-                      )}
-                    </p>
+                  <div className="flex flex-col mr-8">
+                    <p>{selectedCase.caseType}</p>
+                    <p>{selectedCase.filingNumber}</p>
+                    <p>{selectedCase.filingDate}</p>
+                    <p>{selectedCase.registrationNumber}</p>
+                    <p>{selectedCase.registrationDate}</p>
+                    <p>{selectedCase.cnrNumber}</p>
                   </div>
                   <div className="flex flex-col opacity-0">
                     <p>{selectedCase.caseType}</p>
@@ -501,9 +315,7 @@ const DailyCalendar = () => {
                     </>
                   ) : (
                     // If not in edit mode, show case description
-                    <div>
-                      {<p>{selectedCase?.caseId?.caseDetails?.info}</p>}
-                    </div>
+                    <div>{selectedCase.caseDescription}</div>
                   )}
                   <div className="flex w-full justify-end">
                     {isEditMode ? (
@@ -540,19 +352,13 @@ const DailyCalendar = () => {
                       <div className="flex space-x-2">
                         <img src={pet} className="rounded-lg" />
                         <p className="flex justify-center items-center">
-                          {
-                            selectedCase?.caseId?.caseInfo
-                              ?.petitionerAndAdvocate?.petitioner
-                          }
+                          {selectedCase.petitioner}
                         </p>
                       </div>
                       <div className="flex space-x-2">
                         <img src={adv} />
                         <p className="flex justify-center items-center">
-                          {
-                            selectedCase?.caseId?.caseInfo
-                              ?.petitionerAndAdvocate?.advocate
-                          }
+                          {selectedCase.petitionerAdvocate}
                         </p>
                       </div>
                     </div>
@@ -563,19 +369,13 @@ const DailyCalendar = () => {
                       <div className="flex space-x-2">
                         <img src={pet} className="rounded-lg" />
                         <p className="flex justify-center items-center">
-                          {
-                            selectedCase?.caseId?.caseInfo
-                              ?.respondentAndAdvocate?.respondent
-                          }
+                          {selectedCase.respondent}
                         </p>
                       </div>
                       <div className="flex space-x-2">
                         <img src={adv} />
                         <p className="flex justify-center items-center">
-                          {
-                            selectedCase?.caseId?.caseInfo
-                              ?.respondentAndAdvocate?.advocate
-                          }
+                          {selectedCase.respondentAdvocate}
                         </p>
                       </div>
                     </div>
@@ -585,16 +385,6 @@ const DailyCalendar = () => {
             )}
           </DrawerContent>
         </Drawer>
-
-        <div className="flex px-2 space-x-1 duration-300 ease-in-out hover:scale-105 bg-[#49AE52] h-fit rounded-lg justify-center items-center text-center">
-          <img src={editIcon1} className="w-[16px] h-[15px]" />
-          <button
-            onClick={sendMail}
-            className="rounded-lg px-0 mr-0 h-fit py-1 text-white"
-          >
-            Save
-          </button>
-        </div>
       </div>
     </div>
   );

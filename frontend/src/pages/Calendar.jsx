@@ -32,14 +32,14 @@ const Calendar = () => {
     dispatch(userLogOutAction());
     window.location.reload(true);
     setTimeout(() => {
-      Navigate('/');
-    }, 500)
- }
+      Navigate("/");
+    }, 500);
+  };
 
   return (
     <div className="h-[100vh] flex justify-start items-start bg-white">
       {/* --------------------------------------------------SIDEBAR-------------------------------------------------------------- */}
-      <div className="flex flex-col min-w-[300px] justify-between bg-[#E1EEDD] h-screen pl-4 pr-2 pt-2">
+      <div className="flex flex-col min-w-[300px] justify-between bg-[#E1EEDD] h-screen pl-4 pr-2 pt-2 fixed">
         <div>
           <img className="h-12 w-32 font-bold" src={logo}></img>
           <div className="space-y-2 mt-4">
@@ -58,7 +58,10 @@ const Calendar = () => {
               </div>
               <div className="flex pt-8 pl-4 hover:text-green-600 hover:border-green-600 duration-300 ease-in-out">
                 <p>--</p>
-                <p className="pl-2"> <Link to="/dailycalendar"> View Daily Schedule </Link></p>
+                <p className="pl-2">
+                  {" "}
+                  <Link to="/dailycalendar"> View Daily Schedule </Link>
+                </p>
               </div>
               <p className="pt-0 hover:text-green-600 hover:border-green-600 duration-300 ease-in-out">
                 <Link to="/admin/caseregistration"> Case Registration </Link>
@@ -92,14 +95,15 @@ const Calendar = () => {
               )}
             </p>
           </div>
-          {(userInfo?.roles[0] === 8888 || userInfo?.roles[0] === 9999) ? (
-            <button className="flex rounded-lg justify-center border-2 border-gray-400 px-20 mr-2 font-bold py-2 hover:text-green-600 hover:border-green-600 duration-300 ease-in-out"
-            onClick={logOutUser} >
+          {userInfo?.roles[0] === 8888 || userInfo?.roles[0] === 9999 ? (
+            <button
+              className="flex rounded-lg justify-center border-2 border-gray-400 px-20 mr-2 font-bold py-2 hover:text-green-600 hover:border-green-600 duration-300 ease-in-out"
+              onClick={logOutUser}
+            >
               Log Out
             </button>
           ) : (
-            <button className="flex rounded-lg justify-center border-2 border-gray-400 px-20 mr-2 font-bold py-2 hover:text-green-600 hover:border-green-600 duration-300 ease-in-out"
-            >
+            <button className="flex rounded-lg justify-center border-2 border-gray-400 px-20 mr-2 font-bold py-2 hover:text-green-600 hover:border-green-600 duration-300 ease-in-out">
               <Link to="/login"> Log In </Link>
             </button>
           )}
@@ -107,19 +111,28 @@ const Calendar = () => {
       </div>
 
       {/* ----------------------------------------------------------Calendar--------------------------------------------- */}
-      <div className="m-2 md:mx-10 md:-mt-2 mt-24 p-2 md:px-4 md:py-6 rounded-3xl space-y-2">
-        <div className="flex justify-center items-center">
-          <h1 className="font-bold text-4xl text-black mb-2">Calendar</h1>
+      <div className="absolute left-80 mr-4">
+        <div className=" md:-mt-2 mt-24 p-2 md:px-0 md:py-6 rounded-3xl space-y-2">
+          <div className="flex justify-center items-center">
+            <h1 className="font-bold text-4xl text-black mb-2">Calendar</h1>
+          </div>
+          <ScheduleComponent
+            eventSettings={{ dataSource: scheduleData }}
+            selectedDate={new Date(2021, 0, 10)}
+          >
+            <Inject
+              services={[
+                Day,
+                Week,
+                WorkWeek,
+                Month,
+                Agenda,
+                Resize,
+                DragAndDrop,
+              ]}
+            />
+          </ScheduleComponent>
         </div>
-        <ScheduleComponent
-        eventSettings={{dataSource: scheduleData}}
-        selectedDate={new Date(2021, 0, 10)}
-
-        >
-          <Inject
-            services={[Day, Week, WorkWeek, Month, Agenda, Resize, DragAndDrop]}
-          />
-        </ScheduleComponent>
       </div>
     </div>
   );

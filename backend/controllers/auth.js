@@ -19,7 +19,7 @@ exports.handleRegister = async (req, res) => {
 
     // check for duplicate usernames in the db
     const duplicate = await User.findOne({ jobId: jobId }).exec();
-    if (duplicate) return res.sendStatus(409); //Conflict 
+    if (duplicate) return res.sendStatus(409).json({'message':"User Already Exists"})
 
     try {
         //encrypt the password

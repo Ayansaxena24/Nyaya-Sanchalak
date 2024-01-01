@@ -43,7 +43,7 @@ function Home() {
     }, 500);
   };
 
-  console.log("USER INFO ACCESSTOKEN --->>", userInfo?.user);
+  console.log("USER INFO ACCESSTOKEN --->>", userInfo?.accessToken);
 
   return (
     <div className="sm:h-[100vh] sm:flex sm:justify-start sm:items-start sm:bg-white w-full">
