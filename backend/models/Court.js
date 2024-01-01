@@ -31,7 +31,18 @@ const CourtSchema = new mongoose.Schema({
         city: String,
         address: String,
     },
-    images: Array,    
+
+    // cases: [
+    //     {
+    //         caseId: ObjectId,
+    //         ref: 'RegisteredCase'
+    //     }
+    // ], 
+
+    // scheduledCases: [
+
+    // ]
+    
 }, {timestamps: true});
 
 module.exports = mongoose.model('Court', CourtSchema);

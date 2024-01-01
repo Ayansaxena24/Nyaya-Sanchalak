@@ -1,42 +1,23 @@
 import { useRef, useState, useEffect } from 'react';
 import useAuth from '../../hooks/useAuth';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { setCredentials } from '../../features/auth/authSlice';
-import { useLoginMutation } from '../../features/auth/authApiSlice';
-
 
 import axios from '../api/axios';
 const LOGIN_URL = '/auth';
 
 const Login = () => {
-    const userRef = useRef();
-    const errRef = useRef();
-    const [user, setUser] = useState('');
-    const [pwd, setPwd] = useState('');
-    const [errMsg, setErrMsg] = useState('');
-    const navigate = useNavigate();
-
-    const [login, { isLoading }] = useLoginMutation();
-    const dispatch = useDispatch();
-
     const { setAuth } = useAuth();
+
+    const navigate = useNavigate();
     const location = useLocation();
     const from = location.state?.from?.pathname || "/";
 
-    const { isAuthenticated, userInfo } = useSelector(state => state.signIn);
+    const userRef = useRef();
+    const errRef = useRef();
 
-    useEffect(() => { // redirect to dashboard if user is authenticated
-        if (isAuthenticated) {
-            if (userInfo.role === 8888) {
-                navigate('/judge/dashboard');
-            } else {
-                navigate('/admin/dashboard');
-            }
-        }
-    }, [isAuthenticated])
-
-
+    const [user, setUser] = useState('');
+    const [pwd, setPwd] = useState('');
+    const [errMsg, setErrMsg] = useState('');
 
     useEffect(() => {
         userRef.current.focus();
@@ -46,7 +27,7 @@ const Login = () => {
         setErrMsg('');
     }, [user, pwd])
 
-    const handleSubmit = async (e, values, actions) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         try {
@@ -58,18 +39,13 @@ const Login = () => {
                 }
             );
             console.log(JSON.stringify(response?.data));
-            dispatch(userSignInAction(values)); // dispatch action
-            actions.resetForm(); // reset form after submit
-
-            
             //console.log(JSON.stringify(response));
             const accessToken = response?.data?.accessToken;
             const roles = response?.data?.roles;
             setAuth({ user, pwd, roles, accessToken });
             setUser('');
             setPwd('');
-
-            
+            navigate(from, { replace: true });
         } catch (err) {
             if (!err?.response) {
                 setErrMsg('No Server Response');

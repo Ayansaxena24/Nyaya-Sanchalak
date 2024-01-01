@@ -1,9 +1,0 @@
-fastapi
-fastapi[all]==version_number
-uvicorn==version_number
-pydantic
-joblib
-pandas
-transformers
-scikit-learn
-xgboost
