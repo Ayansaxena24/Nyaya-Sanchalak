@@ -1,6 +1,6 @@
 import axios from 'axios';
 // const BASE_URL = 'http://localhost:8000/api';
-const BASE_URL = 'https://nyaya-sanchalak-backend-s5pr.onrender.com/';
+const BASE_URL = process.env.REACT_APP_BACKEND_API;
 
 export default axios.create({ 
     baseURL : BASE_URL
