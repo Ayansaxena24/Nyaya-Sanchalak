@@ -280,6 +280,11 @@ cron-parser@^4.2.0:
   dependencies:
     luxon "^3.2.1"
 
+date-fns@^3.0.6:
+  version "3.0.6"
+  resolved "https://registry.npmjs.org/date-fns/-/date-fns-3.0.6.tgz"
+  integrity sha512-W+G99rycpKMMF2/YD064b2lE7jJGUe+EjOES7Q8BIGY8sbNdbgcs9XFTZwvzc9Jx1f3k7LB7gZaZa7f8Agzljg==
+
 debug@^3.2.7:
   version "3.2.7"
   resolved "https://registry.npmjs.org/debug/-/debug-3.2.7.tgz"
