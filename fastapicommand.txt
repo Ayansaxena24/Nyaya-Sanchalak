@@ -1,0 +1,16 @@
+conda create -p venv  python==3.8 -y
+conda activate "E:\SIH 2023\fastapic\Fast API\venv"
+pip install fastapi
+pip install -r requirements.txt
+pip install tensorflow
+pip install --upgrade typing-extensions
+uvicorn main:app --reload
+
+http://127.0.0.1:8000/predict (post mai)
+
+{
+  "Case_Type": "Theft",
+  "Case_Description": "Stealing a mobile phone",
+  "Potential_Punishment": "Imprisonment for up to 3 years, or fine, or both",
+  "Applicable_Acts": "IPC Section 379"
+}
