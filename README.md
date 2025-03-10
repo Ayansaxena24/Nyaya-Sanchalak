@@ -1,5 +1,5 @@
 ﻿# Nyaya-Sanchalak
- Nyaya Sanchalak - Watch complete Youtube Video here
+ Nyaya Sanchalak - Watch complete Youtube Video here For the Project
 [![Nyaya Sanchalak - Watch complete Youtube Video here](https://img.youtube.com/vi/9IQJfE-mXGA/0.jpg)](https://www.youtube.com/watch?v=9IQJfE-mXGA)
 ![Detailed PPT SIH 2023](https://github.com/Ayansaxena24/Nyaya-Sanchalak/assets/84512148/086206a0-f46f-46c2-aafe-0f5ae07c3dd1)
 ![Detailed PPT SIH 2023 (1)](https://github.com/Ayansaxena24/Nyaya-Sanchalak/assets/84512148/fef871be-9272-4b24-857d-d9b403731374)
